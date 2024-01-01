@@ -24,3 +24,36 @@
 # virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
 hs_err_pid*
 
+.idea/compiler.xml
+.idea/encodings.xml
+.idea/inspectionProfiles/
+.idea/misc.xml
+.idea/workspace.xml
+src/test/
+target/InspectionRecord-1.0/META-INF/
+target/InspectionRecord-1.0/WEB-INF/classes/application.yml
+target/InspectionRecord-1.0/WEB-INF/classes/com/zzh/dao/EqexpertDao.xml
+target/InspectionRecord-1.0/WEB-INF/classes/com/zzh/dao/XZEquipInspectionDao.xml
+target/InspectionRecord-1.0/WEB-INF/classes/com/zzh/dao/XZOtherEventsDao.xml
+target/InspectionRecord-1.0/WEB-INF/classes/com/zzh/dao/XZPatrolRecordDao.xml
+target/InspectionRecord-1.0/WEB-INF/classes/com/zzh/dao/ZZOtherEventsDao.xml
+target/InspectionRecord-1.0/WEB-INF/classes/com/zzh/dao/ZZPatrolRecordDao.xml
+target/InspectionRecord-1.0/WEB-INF/classes/logback-spring.xml
+target/InspectionRecord-1.0/WEB-INF/classes/static/
+target/InspectionRecord-1.0/WEB-INF/classes/templates/
+target/InspectionRecord-1.0/web.xml
+target/classes/application.yml
+target/classes/com/zzh/dao/EqexpertDao.xml
+target/classes/com/zzh/dao/XZEquipInspectionDao.xml
+target/classes/com/zzh/dao/XZOtherEventsDao.xml
+target/classes/com/zzh/dao/XZPatrolRecordDao.xml
+target/classes/com/zzh/dao/ZZOtherEventsDao.xml
+target/classes/com/zzh/dao/ZZPatrolRecordDao.xml
+target/classes/logback-spring.xml
+target/classes/static/
+target/classes/templates/
+target/generated-sources/
+target/generated-test-sources/
+target/maven-archiver/
+target/maven-status/
+target/test-classes/
