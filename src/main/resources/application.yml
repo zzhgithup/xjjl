@@ -1,0 +1,20 @@
+server:
+  port: 8081
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://10.31.11.2:3306/YSG?useUnicode=true&characterEncoding=UTF-8&serverTimezone=GMT%2B8
+    username: root
+    password: baosight
+  thymeleaf:
+    prefix: classpath:/templates/
+    suffix: .html
+  mvc:
+    static-path-pattern: /static/**
+mybatis:
+  mapper-locations: com/zzh/dao/*.xml
+  type-aliases-package: com.zzh.dao
+  configuration:
+    log-impl: org.apache.ibatis.logging.slf4j.Slf4jImpl
+logging:
+  config: classpath:/logback-spring.xml

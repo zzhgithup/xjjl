@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- mapper:根标签，namespace：命名空间，一般保证命名空间唯一 -->
+<mapper namespace="com.zzh.dao.ZZOtherEventsDao">
+
+    <select id="getotherevents" resultType="com.zzh.pojo.OtherEvents">
+        select * from t_zz_otherevents
+    </select>
+
+    <insert id="addotherevent">
+        insert into t_zz_otherevents(t_qttime,t_post,t_classes,t_username,t_event_description,t_camera_number,t_operate)
+        values (#{time},#{qtsjpost},#{qtsjclass},#{qtsjname},'点击编辑','点击编辑',0)
+    </insert>
+
+    <delete id="delotherevent">
+        delete from t_zz_otherevents where t_qttime in
+        <foreach collection="arrs" index="" separator="," close=")" open="(" item="item">
+            #{item, jdbcType=VARCHAR}
+        </foreach>
+    </delete>
+
+    <update id="updothereventsjms">
+        update t_zz_otherevents set t_event_description=#{sjms} where t_qttime=#{date}
+    </update>
+
+    <update id="updothereventsxjbh">
+        update t_zz_otherevents set t_camera_number=#{sxjbh} where t_qttime=#{date}
+    </update>
+
+    <select id="getqtsjInfoByDate" resultType="com.zzh.pojo.OtherEvents">
+        select * from t_zz_otherevents where t_qttime=#{date}
+    </select>
+
+    <update id="updqtsj">
+        update t_zz_otherevents set t_operate=1 where t_qttime=#{date}
+    </update>
+
+    <select id="getzzqtsjbycond" resultType="com.zzh.pojo.OtherEvents">
+        select * from t_zz_otherevents where t_classes like concat('%',#{banci},'%') and t_username like concat('%',#{username},'%')
+        and t_qttime between date(#{starttime}) and date (#{endtime})
+    </select>
+</mapper>

@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- mapper:根标签，namespace：命名空间，一般保证命名空间唯一 -->
+<mapper namespace="com.zzh.dao.XZEquipInspectionDao">
+    <select id="getequipinspections" resultType="com.zzh.pojo.XZEquipInspection">
+        select * from t_xz_equipinspection
+    </select>
+
+    <delete id="delequipinspection">
+        delete  from t_xz_equipinspection where t_xjtime in
+        <foreach collection="arrayList" item="item" open="(" close=")" separator="," index="">
+            #{item, jdbcType=VARCHAR}
+        </foreach>
+    </delete>
+
+    <insert id="addequipinspection">
+        insert into t_xz_equipinspection(t_xjtime,t_post,t_classes,t_username,t_integrated_monitoring,t_ibp,t_remarks,t_operate)
+        values (#{s},#{sbjcpost},#{sbjcclass},#{sbjcname},0,0,'点击编辑',0)
+    </insert>
+
+    <update id="updequipinspection">
+        update t_xz_equipinspection set t_integrated_monitoring=#{zhjk},t_ibp=#{ibp},t_operate=1 where t_xjtime=#{date}
+    </update>
+
+    <update id="updequipinspectionremark">
+        update t_xz_equipinspection set t_remarks=#{remark} where t_xjtime=#{date}
+    </update>
+
+    <select id="getsbjcInfoByDate" resultType="String">
+        select t_remarks from t_xz_equipinspection where  t_xjtime=#{date}
+    </select>
+
+    <select id="getxzsbjcbycond" resultType="com.zzh.pojo.XZEquipInspection">
+        select * from t_xz_equipinspection where t_classes like concat('%',#{banci},'%') and t_username like concat('%',#{username},'%')
+        and t_xjtime between date(#{starttime}) and date (#{endtime})
+    </select>
+</mapper>

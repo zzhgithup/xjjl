@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- mapper:根标签，namespace：命名空间，一般保证命名空间唯一 -->
+<mapper namespace="com.zzh.dao.XZPatrolRecordDao">
+    <select id="getPatrolRecordInfos" resultType="com.zzh.pojo.XZPatrolRecord">
+        select * from t_xz_inspectionrecord
+    </select>
+
+    <insert id="addpatrolrecord">
+        insert into t_xz_inspectionrecord(t_xjtime,t_post,t_classes,t_username,t_station_hall,t_platform,t_exit,t_equip_room,t_customer_equip,t_remarks,t_operate)
+        values (#{xsjltime},#{xsjlpost},#{xsjlclass},#{xsjlname},0,0,0,0,0,'点击编辑',0)
+    </insert>
+
+    <delete id="delpatrolrecord">
+        delete  from t_xz_inspectionrecord where t_xjtime in
+        <foreach item="item" collection="date" separator="," open="(" close=")" index="">
+            #{item, jdbcType=VARCHAR}
+        </foreach>
+    </delete>
+
+    <update id="updpatrolrecord">
+        update t_xz_inspectionrecord set t_station_hall=#{zting},t_platform=#{ztai},t_exit=#{crk},t_equip_room=#{sbqf},t_customer_equip=#{kfsb},t_operate=1 where t_xjtime=#{date}
+    </update>
+
+    <update id="updpatrolrecordremark">
+        update t_xz_inspectionrecord set t_remarks=#{remark} where t_xjtime=#{date}
+    </update>
+
+    <select id="getInfoByDate" resultType="java.lang.String">
+        select t_remarks from t_xz_inspectionrecord where t_xjtime=#{date}
+    </select>
+
+    <select id="getxzxsjlbycond" resultType="com.zzh.pojo.XZPatrolRecord">
+        select * from t_xz_inspectionrecord where t_classes like concat('%',#{banci},'%') and t_username like concat('%',#{username},'%')
+        and t_xjtime between date(#{starttime}) and date (#{endtime})
+    </select>
+</mapper>

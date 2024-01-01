@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="zh-ch">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>设备监察</title>
+    <script src="static/js/jquery-3.7.0.js"></script>
+    <style>
+        *{
+            margin: 0;
+            padding: 0;
+        }
+        html,body{
+            background-image: url("static/img/main-background.png");
+            background-size: 100% 100%;
+        }
+        #main{
+            width: 630px;
+            height: 890px;
+            display: flex;
+            flex-direction: column;
+            justify-content:center;
+            align-items: center;
+            background-image: url("static/img/mokuai.png");
+            background-size: 100% 100%;
+        }
+        #header{
+            background-color: blue;
+            width: 614px;
+            height: 30px;
+        }
+        #header table{
+            width: 614px;
+            height: 30px;
+            border-collapse: collapse;
+        }
+        thead>tr{
+            height: 30px;
+            color: white;
+            background-image: url("static/img/thead.png");
+            background-size: 100% 100%;
+        }
+        #border{
+            width: 614px;
+            height: 840px;
+            overflow: auto;
+        }
+        #border table{
+            width: 614px;
+            /*height: 840px;*/
+            border-collapse: collapse;
+        }
+        tbody>tr{
+            height: 40px;
+            color: white;
+            text-align: center;
+        }
+        td{
+            height: 40px;
+            /*line-height: 40px;*/
+        }
+        /* 滚动条样式 content_l 也可以不自定义*/
+        #border::-webkit-scrollbar {
+            /*滚动条整体样式*/
+            width: 0px;
+            /*高宽分别对应横竖滚动条的尺寸*/
+            height: 0px;
+        }
+
+        #border::-webkit-scrollbar-thumb {
+            /*滚动条里面小方块*/
+            border-radius: 2px;
+            -webkit-box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.2);
+            background: #ffffff;
+        }
+
+        #border::-webkit-scrollbar-track {
+            /*滚动条里面轨道*/
+            -webkit-box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.2);
+            border-radius: 10px;
+            background: rgba(3, 96, 255, 0.25);
+        }
+    </style>
+</head>
+<body>
+<div id="main">
+    <div id="header">
+        <table>
+            <thead>
+                <tr>
+                    <th style="width: 150px;">产生时间</th>
+                    <th style="width: 264px;">变量描述</th>
+                    <th style="width: 100px;">子系统名</th>
+                    <th style="width: 100px;">报警状态</th>
+                </tr>
+            </thead>
+        </table>
+    </div>
+    <div id="border">
+        <table>
+            <tbody></tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+    var num=0;
+    $(function(){
+        timeout;
+    })
+    var timeout=setInterval(function(){
+        $.ajax({
+            url:window.location.protocol+'//'+window.location.host+'/InspectionRecord-1.0/contrast/'+num,
+            type:'get',
+            dataType:'text',
+            success:function(data){
+                console.log(data);
+                if(parseInt(data)===num){
+                    console.log('不需要跟新');
+                }else{
+                    var obj=JSON.parse(data);
+                    num=obj.countNum;
+                    // var newData=JSON.parse(obj.arr);
+                    datacl(obj.arr);
+                }
+            }
+        })
+    },1000)
+    function datacl(data){
+        var html = '';
+        for(var i=0;i<data.length;i++){
+            html+='<tr>';
+            $.each(data[i],function(key,value){
+                if(key==='fd_time'){
+                    html+='<td style="width: 150px;">'+value+'</td>'
+                }
+            })
+            $.each(data[i],function(key,value){
+                if(key==='fd_desc'){
+                    html+='<td style="width: 264px;">'+value+'</td>'
+                }
+            })
+            $.each(data[i],function(key,value){
+                if(key==='fd_system'){
+                    html+='<td style="width: 100px;">'+value+'</td>'
+                }
+            })
+            $.each(data[i],function(key,value){
+                if(key==='fd_state'){
+                    html+='<td style="width: 100px;">未恢复</td>'
+                }
+            })
+            html+='</tr>';
+        }
+        $('tbody').html(html);
+    }
+</script>
+</body>
+</html>

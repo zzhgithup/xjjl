@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- mapper:根标签，namespace：命名空间，一般保证命名空间唯一 -->
+<mapper namespace="com.zzh.dao.ZZPatrolRecordDao">
+    <select id="getPatrolRecordInfos" resultType="com.zzh.pojo.ZZPatrolRecord">
+        select * from t_zz_inspectionrecord
+    </select>
+
+    <insert id="addpatrolrecord">
+        insert into t_zz_inspectionrecord(t_xstime,t_post,t_classes,t_username,t_manage_room,t_equipment_channel,t_enclosure,t_exit,t_guiding_facilities,t_selfservice_equip,t_escalator,t_platform_door,t_turnstile,t_passenger_behavior,t_post_discipline,t_operate)
+        values (#{xsjltime},#{xsjlpost},#{xsjlclass},#{xsjlname},0,0,0,0,0,0,0,0,0,0,0,0)
+    </insert>
+
+    <delete id="delpatrolrecord">
+        delete  from t_zz_inspectionrecord where t_xstime in
+        <foreach item="item" collection="list" separator="," open="(" close=")" index="">
+            #{item, jdbcType=VARCHAR}
+        </foreach>
+    </delete>
+
+    <update id="updpatrolrecord">
+        update t_zz_inspectionrecord set t_manage_room=#{glyf},t_equipment_channel=#{sbqtd},t_enclosure=#{wb},t_exit=#{crk},t_guiding_facilities=#{dxss},t_selfservice_equip=#{zzsb},t_escalator=#{dft},t_platform_door=#{ztm},
+        t_turnstile=#{afc},t_passenger_behavior=#{ckxw},t_post_discipline=#{gwjl},t_operate=1 where t_xstime=#{date}
+    </update>
+
+    <select id="getzzxsjlbycond" resultType="com.zzh.pojo.ZZPatrolRecord">
+        select * from t_zz_inspectionrecord where t_classes like concat('%',#{banci},'%') and t_username like concat('%',#{username},'%')
+        and t_xstime between date(#{starttime}) and date (#{endtime})
+    </select>
+
+</mapper>

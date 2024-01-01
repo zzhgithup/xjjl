@@ -1,0 +1,1816 @@
+<!DOCTYPE html>
+<html lang="zh-ch">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>巡检记录</title>
+    <script src="static/js/jquery-3.7.0.js"></script>
+    <style>
+        *{margin: 0;padding: 0;}html,body{width: 100%;height: 100%;}
+        .flexrowsa{
+            display: flex;
+            flex-direction: row;
+            justify-content: space-around;
+            align-items: center;
+        }
+        .flexcolumnsa{
+            display: flex;
+            flex-direction: column;
+            justify-content: space-around;
+            align-items: center;
+        }
+        .flexcolumnleft{
+            display: flex;
+            flex-direction: column;
+            justify-content: space-around;
+            align-items: start;
+        }
+        .textalign{
+            width: 150px;
+            height: 30px;
+            border: none;
+        }
+        .tctextalign{
+            width: 150px;
+            height: 24px;
+            border: none;
+        }
+        .fontstyle{
+            color: white;
+            font-size: 20px;
+        }
+        .tcfontstyle{
+            color: white;
+            font-size: 16px;
+        }
+        .btn{
+            width: 60px;
+            height: 20px;
+            color: white;
+            border: none;
+            background-color: rgba(0, 0, 0, 0);
+        }
+        td{
+            border: 1px solid royalblue;
+            margin: 0;
+            padding: 0;
+            height: 30px;
+            line-height: 30px;
+            color: white;
+            text-align: center;
+        }
+        th{
+            background-image: url('static/img/tableHeader.png');
+            overflow: hidden;
+            height: 30px;
+
+            background-size: 100% 100%;
+        }
+        td>button{
+            width: 40px;
+            height: 25px;
+            border: none;
+            background-color: rgb(18, 18, 128);
+            color: white;
+            cursor: pointer;
+        }
+        /* 滚动条样式 content_l 也可以不自定义*/
+        .tables::-webkit-scrollbar {
+            /*滚动条整体样式*/
+            width: 2px;
+            /*高宽分别对应横竖滚动条的尺寸*/
+            height: 1px;
+        }
+
+        .tables::-webkit-scrollbar-thumb {
+            /*滚动条里面小方块*/
+            border-radius: 2px;
+            -webkit-box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.2);
+            background: #ffffff;
+        }
+
+        .tables::-webkit-scrollbar-track {
+            /*滚动条里面轨道*/
+            -webkit-box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.2);
+            border-radius: 10px;
+            background: rgba(3, 96, 255, 0.25);
+        }
+        #xzsbjchead th:nth-child(6){
+            font-size: 12px;
+        }
+    </style>
+
+</head>
+<body>
+<div id="mainback" class="flexcolumnsa" style="width: 100%;height: 100%; background-image: url('static/img/main-background.png');background-size: 100% 100%;">
+    <div id="selecter" class="flexcolumnleft" style="width: 99%; height: 10%;background-image: url('static/img/mokuai.png');background-size: 100% 100%;">
+        <div style="height: 40px; width: auto;" class="flexrowsa">
+            <div style="width: 40px;height: 40px;background-image: url('static/img/x.png');"></div>
+            <div style="width: 100px; height: 40px; background-image: url('static/img/textback.png');background-size: 100% 100%; text-align: center;line-height: 40px;color: white;font-size: 20px;">查询条件</div>
+        </div>
+        <div  style="height: 56px; width: 80%;margin-left: 5%;" class="flexrowsa">
+            <div>
+                <span class="fontstyle">岗位：</span>
+                <!-- <input type="text" class="textalign"> -->
+                <select name="zw" id="zwselect" class="textalign" onchange="zwchange()">
+                    <option>行车值班员</option>
+                    <option>值班站长</option>
+                </select>
+            </div>
+            <div>
+                <span class="fontstyle">班次：</span>
+                <input id="banci" type="text" class="textalign">
+            </div>
+            <div>
+                <span class="fontstyle">姓名：</span>
+                <input id="username" type="text" class="textalign">
+            </div>
+            <div>
+                <span class="fontstyle">巡视时间</span>
+                <input id="starttime" type="date" class="textalign">
+                <span class="fontstyle">至</span>
+                <input id="endtime" type="date" class="textalign">
+            </div>
+            <button onclick="conditionalQuery()" class="fontstyle" style="width: 80px; height: 30px;border: none;background-color: rgba(0, 0, 0, 0); background-image: url('static/img/button.png');background-size: 100% 100%;">确定</button>
+        </div>
+    </div>
+    <div id="change-ditu2" class="flexcolumnsa" style="width: 99%; height: 88%;display: none;">
+        <div id="tablefore" class="flexcolumnleft"  style="width: 100%; height: 59%;background-image: url('static/img/mokuai.png');background-size: 100% 100%;">
+            <div style="height: 40px; width: auto;" class="flexrowsa">
+                <div style="width: 40px;height: 40px;background-image: url('static/img/x.png');"></div>
+                <div style="width: 150px; height: 40px; background-image: url('static/img/textback.png');background-size: 100% 100%; text-align: center;line-height: 40px;color: white;font-size: 20px;">重点设备检查</div>
+            </div>
+            <div style="width: 100%;height: 3%; position: relative;">
+                <button onclick="zzxsjlTC()" class="btn flexrowsa" style="position: absolute;right: 70px;cursor: pointer;"><div style="width: 16px;height: 16px; background-image: url('static/img/add.png');background-size: 100% 100%;"></div><span>新增</span></button>
+                <button onclick="delzzxsjlinfo()" class="btn flexrowsa" style="position: absolute;right: 5px;cursor: pointer;"><div style="width: 16px;height: 16px; background-image: url('static/img/delete.png');background-size: 100% 100%;"></div><span>删除</span></button>
+            </div>
+
+
+            <div style="width: 100%;height: 85%;display: flex;flex-direction: column">
+                <div id="zzxsjlhead" style="width: 100%;height: 30px">
+                    <table style="width: 100%;border-collapse: collapse;">
+                        <thead style="width: 100%;">
+                            <tr class="fontstyle" style="display: flex">
+                                <th style="width: 40px"><input onclick="selectallzzxsjl(this)" type="checkbox"></th>
+                                <th>巡视时间</th>
+                                <th>岗位</th>
+                                <th>班次</th>
+                                <th>姓名</th>
+                                <th>管理用房</th>
+                                <th>设备区通道</th>
+                                <th>围蔽</th>
+                                <th>出入口</th>
+                                <th>照明、导向设施</th>
+                                <th>商铺、商业自助设备</th>
+                                <th>电扶梯</th>
+                                <th>站台门</th>
+                                <th>AFC设备</th>
+                                <th>乘客行为</th>
+                                <th>岗位纪律</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                    </table>
+                </div>
+                <div class="tables" style="overflow: auto;flex-grow: 1">
+                    <table style="width: 100%;border-collapse: collapse;">
+                        <tbody id="zzxsjlbody" style="overflow: auto;"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div id="tablefive" class="flexcolumnleft"  style="width: 100%; height: 40%;background-image: url('static/img/mokuai.png');background-size: 100% 100%;">
+            <div style="height: 40px; width: auto;" class="flexrowsa">
+                <div style="width: 40px;height: 40px;background-image: url('static/img/x.png');"></div>
+                <div style="width: 150px; height: 40px; background-image: url('static/img/textback.png');background-size: 100% 100%; text-align: center;line-height: 40px;color: white;font-size: 20px;">其他事件</div>
+            </div>
+            <div style="width: 100%;height: 3%; position: relative;">
+                <button onclick="zzqtsjTC()" class="btn flexrowsa" style="position: absolute;right: 70px;cursor: pointer;"><div style="width: 16px;height: 16px; background-image: url('static/img/add.png');background-size: 100% 100%;"></div><span>新增</span></button>
+                <button onclick="delzzqtsjinfo()" class="btn flexrowsa" style="position: absolute;right: 5px;cursor: pointer;"><div style="width: 16px;height: 16px; background-image: url('static/img/delete.png');background-size: 100% 100%;"></div><span>删除</span></button>
+            </div>
+
+            <div style="width: 100%;height: 77%;display: flex;flex-direction: column">
+                <div id="zzqtsjhead" style="width: 100%;height: 30px">
+                    <table style="width: 100%;border-collapse: collapse;">
+                        <thead style="width: 100%;">
+                        <tr class="fontstyle" style="display: flex">
+                            <th style="width: 40px"><input onclick="selectallzzqtsj(this)" type="checkbox"></th>
+                            <th>时间</th>
+                            <th>岗位</th>
+                            <th>班次</th>
+                            <th>姓名</th>
+                            <th>事件描述</th>
+                            <th>摄像头编号</th>
+                            <th>操作</th>
+                        </tr>
+                        </thead>
+                    </table>
+                </div>
+                <div class="tables" style="overflow: auto;flex-grow: 1">
+                    <table style="width: 100%;border-collapse: collapse;">
+                        <tbody id="zzqtsjbody" style="overflow: auto;"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="change-ditu1" class="flexcolumnsa" style="width: 99%; height: 88%;display: block;">
+        <div id="tableone" class="flexcolumnleft"  style="width: 100%; height: 48%;background-image: url('static/img/mokuai.png');background-size: 100% 100%;">
+            <div style="height: 40px; width: auto;" class="flexrowsa">
+                <div style="width: 40px;height: 40px;background-image: url('static/img/x.png');"></div>
+                <div style="width: 150px; height: 40px; background-image: url('static/img/textback.png');background-size: 100% 100%; text-align: center;line-height: 40px;color: white;font-size: 20px;">车站巡视记录表</div>
+            </div>
+            <div style="width: 100%;height: 5%; position: relative;">
+                <button onclick="xzxsjlTC()" class="btn flexrowsa" style="position: absolute;right: 70px;cursor: pointer;"><div style="width: 16px;height: 16px; background-image: url('static/img/add.png');background-size: 100% 100%;"></div><span>新增</span></button>
+                <button onclick="delxzxsjlinfo()" class="btn flexrowsa" style="position: absolute;right: 5px;cursor: pointer;"><div style="width: 16px;height: 16px; background-image: url('static/img/delete.png');background-size: 100% 100%;"></div><span>删除</span></button>
+            </div>
+
+            <div style="width: 100%;height: 85%;display: flex;flex-direction: column">
+                <div id="xzxsjlhead" style="width: 100%;height: 30px">
+                    <table style="width: 100%;border-collapse: collapse;">
+                        <thead style="width: 100%;">
+                            <tr class="fontstyle" style="display: flex">
+                                <th style="width: 40px"><input onclick="selectallxzxsjl(this)" type="checkbox"></th>
+                                <th>巡视时间</th>
+                                <th>岗位</th>
+                                <th>班次</th>
+                                <th>姓名</th>
+                                <th>站厅</th>
+                                <th>站台</th>
+                                <th>出入口</th>
+                                <th>设备区(房)</th>
+                                <th>客服设备</th>
+                                <th>备注</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                    </table>
+                </div>
+                <div class="tables" style="overflow: auto;flex-grow: 1">
+                    <table style="width: 100%;border-collapse: collapse;">
+                        <tbody id="xzxsjlbody" style="overflow: auto;"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div id="tabletwo" class="flexcolumnleft"  style="width: 100%; height: 25%;background-image: url('static/img/mokuai.png');background-size: 100% 100%;">
+            <div style="height: 40px; width: auto;" class="flexrowsa">
+                <div style="width: 40px;height: 40px;background-image: url('static/img/x.png');"></div>
+                <div style="width: 150px; height: 40px; background-image: url('static/img/textback.png');background-size: 100% 100%; text-align: center;line-height: 40px;color: white;font-size: 20px;">重点设备检查</div>
+            </div>
+            <div style="width: 100%;height: 10%; position: relative;">
+                <button onclick="xzsbjcTC()" class="btn flexrowsa" style="position: absolute;right: 70px;cursor: pointer;"><div style="width: 16px;height: 16px; background-image: url('static/img/add.png');background-size: 100% 100%;"></div><span>新增</span></button>
+                <button onclick="delxzsbjcinfo()" class="btn flexrowsa" style="position: absolute;right: 5px;cursor: pointer;"><div style="width: 16px;height: 16px; background-image: url('static/img/delete.png');background-size: 100% 100%;"></div><span>删除</span></button>
+            </div>
+
+
+            <div style="width: 100%;height: 70%;display: flex;flex-direction: column">
+                <div id="xzsbjchead" style="width: 100%;height: 30px">
+                    <table style="width: 100%;border-collapse: collapse;">
+                        <thead style="width: 100%;">
+                        <tr class="fontstyle" style="display: flex">
+                            <th style="width: 40px"><input onclick="selectallxzsbjc(this)" type="checkbox"></th>
+                            <th>巡视时间</th>
+                            <th>岗位</th>
+                            <th>班次</th>
+                            <th>姓名</th>
+                            <th>综合监控(隧道通风系统、大系统、小系统、水系统、<br>给排水系统、端门、SPKS、防护门)</th>
+                            <th>IBP盘(人防门)</th>
+                            <th>备注</th>
+                            <th>操作</th>
+                        </tr>
+                        </thead>
+                    </table>
+                </div>
+                <div class="tables" style="overflow: auto;flex-grow: 1">
+                    <table style="width: 100%;border-collapse: collapse;">
+                        <tbody id="xzsbjcbody" style="overflow: auto;"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div id="tablethree" class="flexcolumnleft"  style="width: 100%; height: 25%; background-image: url('static/img/mokuai.png');background-size: 100% 100%;">
+            <div style="height: 40px; width: auto;" class="flexrowsa">
+                <div style="width: 40px;height: 40px;background-image: url('static/img/x.png');"></div>
+                <div style="width: 150px; height: 40px; background-image: url('static/img/textback.png');background-size: 100% 100%; text-align: center;line-height: 40px;color: white;font-size: 20px;">应急及其他事件</div>
+            </div>
+            <div style="width: 100%;height: 10%; position: relative;">
+                <button onclick="xzqtsjTC()" class="btn flexrowsa" style="position: absolute;right: 70px;cursor: pointer;"><div style="width: 16px;height: 16px; background-image: url('static/img/add.png');background-size: 100% 100%;"></div><span>新增</span></button>
+                <button onclick="delxzqtsjinfo()" class="btn flexrowsa" style="position: absolute;right: 5px;cursor: pointer;"><div style="width: 16px;height: 16px; background-image: url('static/img/delete.png');background-size: 100% 100%;"></div><span>删除</span></button>
+            </div>
+
+            <div style="width: 100%;height: 70%;display: flex;flex-direction: column">
+                <div id="xzqtsjhead" style="width: 100%;height: 30px">
+                    <table style="width: 100%;border-collapse: collapse;">
+                        <thead style="width: 100%;">
+                        <tr class="fontstyle" style="display: flex">
+                            <th style="width: 40px"><input onclick="selectallxzqtsj(this)" type="checkbox"></th>
+                            <th>巡视时间</th>
+                            <th>岗位</th>
+                            <th>班次</th>
+                            <th>姓名</th>
+                            <th>事件描述</th>
+                            <th>摄像头编号</th>
+                            <th>操作</th>
+                        </tr>
+                        </thead>
+                    </table>
+                </div>
+                <div class="tables" style="overflow: auto;flex-grow: 1">
+                    <table style="width: 100%;border-collapse: collapse;">
+                        <tbody id="xzqtsjbody" style="overflow: auto;"></tbody>
+                    </table>
+                </div>
+            </div>
+            <!--<div class="tables" style="width: 100%;height: 70%; overflow: auto;">-->
+                <!--<table style="width: 100%;border-collapse: collapse;">-->
+                    <!--<thead style="width: 100%;">-->
+                    <!--<tr class="fontstyle">-->
+                        <!--<th><input onclick="selectallxzqtsj(this)" type="checkbox"></th>-->
+                        <!--<th>巡视时间</th>-->
+                        <!--<th>岗位</th>-->
+                        <!--<th>班次</th>-->
+                        <!--<th>姓名</th>-->
+                        <!--<th>事件描述</th>-->
+                        <!--<th>摄像头编号</th>-->
+                        <!--<th>操作</th>-->
+                    <!--</tr>-->
+                    <!--</thead>-->
+
+                    <!--<tbody id="xzqtsjbody"></tbody>-->
+
+                <!--</table>-->
+            <!--</div>-->
+        </div>
+    </div>
+
+</div>
+
+<!-- 行值巡视记录新增框和编辑框 -->
+<div  id="xzxsjladdinfo" class="flexcolumnsa" style="position: fixed;top: 300px; left: 600px;display: none;">
+    <div style="color: white;width: 300px; height: 30px;line-height: 30px;background-color: rgb(7, 6, 83);font-size: 20px;">新增操作</div>
+    <div class="flexcolumnsa" style="width: 300px; height: 250px; background-color: rgb(2, 2, 56);">
+        <div>
+            <span class="tcfontstyle">时间:</span>
+            <input id="xzxsjltime" class="tctextalign" type="datetime-local" step="1">
+        </div>
+        <div>
+            <span class="tcfontstyle">岗位:</span>
+            <input id="xzxsjlpost" class="tctextalign" type="text">
+        </div>
+        <div>
+            <span class="tcfontstyle">班次:</span>
+            <input id="xzxsjlclass" class="tctextalign" type="text">
+        </div>
+        <div>
+            <span class="tcfontstyle">姓名:</span>
+            <input id="xzxsjlname" class="tctextalign" type="text">
+        </div>
+        <div class="flexrowsa" style="width: 300px;">
+            <button class="tcfontstyle" onclick="addxzxsjlinfo()" style="width: 80px; height: 30px;border: none;background-color: rgba(0, 0, 0, 0); background-image: url('static/img/button.png');background-size: 100% 100%;cursor: pointer;">确定</button>
+            <button class="tcfontstyle" onclick="yingchangTC()" style="width: 80px; height: 30px;border: none;background-color: rgba(0, 0, 0, 0); background-image: url('static/img/button.png');background-size: 100% 100%;cursor: pointer;">取消</button>
+        </div>
+    </div>
+</div>
+<div id="xzxsjlbjwbk" style="position: fixed;top: 300px; left: 600px;display: none;">
+    <div id="xzxsjlbjtitle" style="color: white;width: 300px; height: 30px;line-height: 30px;background-color: rgb(7, 6, 83);font-size: 20px;">编辑</div>
+    <textarea style="width: 298px;height: 150px;resize: none;padding-left: 2px;font-size: 16px;" placeholder="事件描述"></textarea>
+    <div class="flexrowsa" style="width: 300px;background-color: rgb(7, 6, 83);">
+        <button class="tcfontstyle" onclick="xzxsjlbjupd()" style="width: 80px; height: 30px;border: none;background-color: rgba(0, 0, 0, 0); background-image: url('static/img/button.png');background-size: 100% 100%;cursor: pointer;">确定</button>
+        <button class="tcfontstyle" onclick="yingchangBJ()" style="width: 80px; height: 30px;border: none;background-color: rgba(0, 0, 0, 0); background-image: url('static/img/button.png');background-size: 100% 100%;cursor: pointer;">取消</button>
+    </div>
+</div>
+<!-- 行值巡视记录新增框和编辑框 -->
+
+<!-- 行值设备检查新增框和编辑框 -->
+<div  id="xzsbjcaddinfo" class="flexcolumnsa" style="position: fixed;top: 300px; left: 600px;display: none;">
+    <div style="color: white;width: 300px; height: 30px;line-height: 30px;background-color: rgb(7, 6, 83);font-size: 20px;">新增操作</div>
+    <div class="flexcolumnsa" style="width: 300px; height: 250px; background-color: rgb(2, 2, 56);">
+        <div>
+            <span class="tcfontstyle">时间:</span>
+            <input id="xzsbjctime" class="tctextalign" type="datetime-local" step="1">
+        </div>
+        <div>
+            <span class="tcfontstyle">岗位:</span>
+            <input id="xzsbjcpost" class="tctextalign" type="text">
+        </div>
+        <div>
+            <span class="tcfontstyle">班次:</span>
+            <input id="xzsbjcclass" class="tctextalign" type="text">
+        </div>
+        <div>
+            <span class="tcfontstyle">姓名:</span>
+            <input id="xzsbjcname" class="tctextalign" type="text">
+        </div>
+        <div class="flexrowsa" style="width: 300px;">
+            <button class="tcfontstyle" onclick="addxzsbjcinfo()" style="width: 80px; height: 30px;border: none;background-color: rgba(0, 0, 0, 0); background-image: url('static/img/button.png');background-size: 100% 100%;cursor: pointer;">确定</button>
+            <button class="tcfontstyle" onclick="yingchangTC()" style="width: 80px; height: 30px;border: none;background-color: rgba(0, 0, 0, 0); background-image: url('static/img/button.png');background-size: 100% 100%;cursor: pointer;">取消</button>
+        </div>
+    </div>
+</div>
+<div id="xzsbjcbjwbk" style="position: fixed;top: 300px; left: 600px;display: none;">
+    <div id="xzsbjcbjtitle" style="color: white;width: 300px; height: 30px;line-height: 30px;background-color: rgb(7, 6, 83);font-size: 20px;">编辑</div>
+    <textarea style="width: 298px;height: 150px;resize: none;padding-left: 2px;font-size: 16px;" placeholder="事件描述"></textarea>
+    <div class="flexrowsa" style="width: 300px;background-color: rgb(7, 6, 83);">
+        <button class="tcfontstyle" onclick="xzsbjcbjupd()" style="width: 80px; height: 30px;border: none;background-color: rgba(0, 0, 0, 0); background-image: url('static/img/button.png');background-size: 100% 100%;cursor: pointer;">确定</button>
+        <button class="tcfontstyle" onclick="yingchangBJ()" style="width: 80px; height: 30px;border: none;background-color: rgba(0, 0, 0, 0); background-image: url('static/img/button.png');background-size: 100% 100%;cursor: pointer;">取消</button>
+    </div>
+</div>
+<!-- 行值设备检查新增框和编辑框 -->
+
+<!-- 行值其他事件新增框和编辑框 -->
+<div  id="xzqtsjaddinfo" class="flexcolumnsa" style="position: fixed;top: 300px; left: 600px;display: none;">
+    <div style="color: white;width: 300px; height: 30px;line-height: 30px;background-color: rgb(7, 6, 83);font-size: 20px;">新增操作</div>
+    <div class="flexcolumnsa" style="width: 300px; height: 250px; background-color: rgb(2, 2, 56);">
+        <div>
+            <span class="tcfontstyle">时间:</span>
+            <input id="xzqtsjtime" class="tctextalign" type="datetime-local" step="1">
+        </div>
+        <div>
+            <span class="tcfontstyle">岗位:</span>
+            <input id="xzqtsjpost" class="tctextalign" type="text">
+        </div>
+        <div>
+            <span class="tcfontstyle">班次:</span>
+            <input id="xzqtsjclass" class="tctextalign" type="text">
+        </div>
+        <div>
+            <span class="tcfontstyle">姓名:</span>
+            <input id="xzqtsjname" class="tctextalign" type="text">
+        </div>
+        <div class="flexrowsa" style="width: 300px;">
+            <button class="tcfontstyle" onclick="addxzqtsjinfo()" style="width: 80px; height: 30px;border: none;background-color: rgba(0, 0, 0, 0); background-image: url('static/img/button.png');background-size: 100% 100%;cursor: pointer;">确定</button>
+            <button class="tcfontstyle" onclick="yingchangTC()" style="width: 80px; height: 30px;border: none;background-color: rgba(0, 0, 0, 0); background-image: url('static/img/button.png');background-size: 100% 100%;cursor: pointer;">取消</button>
+        </div>
+    </div>
+</div>
+<div id="xzqtsjbjwbk" style="position: fixed;top: 300px; left: 600px;display: none;">
+    <div id="xzqtsjbjtitle" style="color: white;width: 300px; height: 30px;line-height: 30px;background-color: rgb(7, 6, 83);font-size: 20px;">编辑</div>
+    <textarea style="width: 298px;height: 150px;resize: none;padding-left: 2px;font-size: 16px;" placeholder="事件描述"></textarea>
+    <div class="flexrowsa" style="width: 300px;background-color: rgb(7, 6, 83);">
+        <button class="tcfontstyle" onclick="xzqtsjbjupd()" style="width: 80px; height: 30px;border: none;background-color: rgba(0, 0, 0, 0); background-image: url('static/img/button.png');background-size: 100% 100%;cursor: pointer;">确定</button>
+        <button class="tcfontstyle" onclick="yingchangBJ()" style="width: 80px; height: 30px;border: none;background-color: rgba(0, 0, 0, 0); background-image: url('static/img/button.png');background-size: 100% 100%;cursor: pointer;">取消</button>
+    </div>
+</div>
+<div id="xzqtsjbjwbk2" style="position: fixed;top: 300px; left: 600px;display: none;">
+    <div id="xzqtsjbjtitle2" style="color: white;width: 300px; height: 30px;line-height: 30px;background-color: rgb(7, 6, 83);font-size: 20px;">编辑</div>
+    <textarea style="width: 298px;height: 150px;resize: none;padding-left: 2px;font-size: 16px;" placeholder="事件描述"></textarea>
+    <div class="flexrowsa" style="width: 300px;background-color: rgb(7, 6, 83);">
+        <button class="tcfontstyle" onclick="xzqtsjbjupd2()" style="width: 80px; height: 30px;border: none;background-color: rgba(0, 0, 0, 0); background-image: url('static/img/button.png');background-size: 100% 100%;cursor: pointer;">确定</button>
+        <button class="tcfontstyle" onclick="yingchangBJ()" style="width: 80px; height: 30px;border: none;background-color: rgba(0, 0, 0, 0); background-image: url('static/img/button.png');background-size: 100% 100%;cursor: pointer;">取消</button>
+    </div>
+</div>
+<!-- 行值其他事件新增框和编辑框 -->
+
+<!-- 值站巡视记录新增框和编辑框 -->
+<div  id="zzxsjladdinfo" class="flexcolumnsa" style="position: fixed;top: 300px; left: 600px;display: none;">
+    <div style="color: white;width: 300px; height: 30px;line-height: 30px;background-color: rgb(7, 6, 83);font-size: 20px;">新增操作</div>
+    <div class="flexcolumnsa" style="width: 300px; height: 250px; background-color: rgb(2, 2, 56);">
+        <div>
+            <span class="tcfontstyle">时间:</span>
+            <input id="zzxsjltime" class="tctextalign" type="datetime-local" step="1">
+        </div>
+        <div>
+            <span class="tcfontstyle">岗位:</span>
+            <input id="zzxsjlpost" class="tctextalign" type="text">
+        </div>
+        <div>
+            <span class="tcfontstyle">班次:</span>
+            <input id="zzxsjlclass" class="tctextalign" type="text">
+        </div>
+        <div>
+            <span class="tcfontstyle">姓名:</span>
+            <input id="zzxsjlname" class="tctextalign" type="text">
+        </div>
+        <div class="flexrowsa" style="width: 300px;">
+            <button class="tcfontstyle" onclick="addzzxsjlinfo()" style="width: 80px; height: 30px;border: none;background-color: rgba(0, 0, 0, 0); background-image: url('static/img/button.png');background-size: 100% 100%;cursor: pointer;">确定</button>
+            <button class="tcfontstyle" onclick="yingchangTC()" style="width: 80px; height: 30px;border: none;background-color: rgba(0, 0, 0, 0); background-image: url('static/img/button.png');background-size: 100% 100%;cursor: pointer;">取消</button>
+        </div>
+    </div>
+</div>
+<div id="zzxsjlbjwbk" style="position: fixed;top: 300px; left: 600px;display: none;">
+    <div id="zzxsjlbjtitle" style="color: white;width: 300px; height: 30px;line-height: 30px;background-color: rgb(7, 6, 83);font-size: 20px;">编辑</div>
+    <textarea style="width: 298px;height: 150px;resize: none;padding-left: 2px;font-size: 16px;" placeholder="事件描述"></textarea>
+    <div class="flexrowsa" style="width: 300px;background-color: rgb(7, 6, 83);">
+        <button class="tcfontstyle" onclick="zzxsjlbjupd()" style="width: 80px; height: 30px;border: none;background-color: rgba(0, 0, 0, 0); background-image: url('static/img/button.png');background-size: 100% 100%;cursor: pointer;">确定</button>
+        <button class="tcfontstyle" onclick="yingchangBJ()" style="width: 80px; height: 30px;border: none;background-color: rgba(0, 0, 0, 0); background-image: url('static/img/button.png');background-size: 100% 100%;cursor: pointer;">取消</button>
+    </div>
+</div>
+<!-- 值站巡视记录新增框和编辑框 -->
+
+<!-- 行值其他事件新增框和编辑框 -->
+<div  id="zzqtsjaddinfo" class="flexcolumnsa" style="position: fixed;top: 300px; left: 600px;display: none;">
+    <div style="color: white;width: 300px; height: 30px;line-height: 30px;background-color: rgb(7, 6, 83);font-size: 20px;">新增操作</div>
+    <div class="flexcolumnsa" style="width: 300px; height: 250px; background-color: rgb(2, 2, 56);">
+        <div>
+            <span class="tcfontstyle">时间:</span>
+            <input id="zzqtsjtime" class="tctextalign" type="datetime-local" step="1">
+        </div>
+        <div>
+            <span class="tcfontstyle">岗位:</span>
+            <input id="zzqtsjpost" class="tctextalign" type="text">
+        </div>
+        <div>
+            <span class="tcfontstyle">班次:</span>
+            <input id="zzqtsjclass" class="tctextalign" type="text">
+        </div>
+        <div>
+            <span class="tcfontstyle">姓名:</span>
+            <input id="zzqtsjname" class="tctextalign" type="text">
+        </div>
+        <div class="flexrowsa" style="width: 300px;">
+            <button class="tcfontstyle" onclick="addzzqtsjinfo()" style="width: 80px; height: 30px;border: none;background-color: rgba(0, 0, 0, 0); background-image: url('static/img/button.png');background-size: 100% 100%;cursor: pointer;">确定</button>
+            <button class="tcfontstyle" onclick="yingchangTC()" style="width: 80px; height: 30px;border: none;background-color: rgba(0, 0, 0, 0); background-image: url('static/img/button.png');background-size: 100% 100%;cursor: pointer;">取消</button>
+        </div>
+    </div>
+</div>
+<div id="zzqtsjbjwbk" style="position: fixed;top: 300px; left: 600px;display: none;">
+    <div id="zzqtsjbjtitle" style="color: white;width: 300px; height: 30px;line-height: 30px;background-color: rgb(7, 6, 83);font-size: 20px;">编辑</div>
+    <textarea style="width: 298px;height: 150px;resize: none;padding-left: 2px;font-size: 16px;" placeholder="事件描述"></textarea>
+    <div class="flexrowsa" style="width: 300px;background-color: rgb(7, 6, 83);">
+        <button class="tcfontstyle" onclick="zzqtsjbjupd()" style="width: 80px; height: 30px;border: none;background-color: rgba(0, 0, 0, 0); background-image: url('static/img/button.png');background-size: 100% 100%;cursor: pointer;">确定</button>
+        <button class="tcfontstyle" onclick="yingchangBJ()" style="width: 80px; height: 30px;border: none;background-color: rgba(0, 0, 0, 0); background-image: url('static/img/button.png');background-size: 100% 100%;cursor: pointer;">取消</button>
+    </div>
+</div>
+<div id="zzqtsjbjwbk2" style="position: fixed;top: 300px; left: 600px;display: none;">
+    <div id="zzqtsjbjtitle2" style="color: white;width: 300px; height: 30px;line-height: 30px;background-color: rgb(7, 6, 83);font-size: 20px;">编辑</div>
+    <textarea style="width: 298px;height: 150px;resize: none;padding-left: 2px;font-size: 16px;" placeholder="事件描述"></textarea>
+    <div class="flexrowsa" style="width: 300px;background-color: rgb(7, 6, 83);">
+        <button class="tcfontstyle" onclick="zzqtsjbjupd2()" style="width: 80px; height: 30px;border: none;background-color: rgba(0, 0, 0, 0); background-image: url('static/img/button.png');background-size: 100% 100%;cursor: pointer;">确定</button>
+        <button class="tcfontstyle" onclick="yingchangBJ()" style="width: 80px; height: 30px;border: none;background-color: rgba(0, 0, 0, 0); background-image: url('static/img/button.png');background-size: 100% 100%;cursor: pointer;">取消</button>
+    </div>
+</div>
+<!-- 行值其他事件新增框和编辑框 -->
+</div>
+
+
+
+
+
+
+<script>
+    var xzxsjlarr=[],xzsbjcarr=[],xzqtsjarr=[],zzqtsjarr=[],zzxsjlarr=[];
+    var t_station_hall='t_station_hall',t_platform='t_platform',t_exit='t_exit',t_equip_room='t_equip_room',t_customer_equip='t_customer_equip';
+    var bjjltime='';
+    var t_integrated_monitoring='t_integrated_monitoring',t_ibp='t_ibp';
+    var t_event_description='t_event_description',t_camera_number='t_camera_number';
+    var t_manage_room='t_manage_room',t_equipment_channel='t_equipment_channel',t_enclosure='t_enclosure',t_guiding_facilities='t_guiding_facilities',t_selfservice_equip='t_selfservice_equip',t_escalator='t_escalator',t_platform_door='t_platform_door',t_turnstile='t_turnstile',t_passenger_behavior='t_passenger_behavior',t_post_discipline='t_post_discipline';
+    var xzxsjlopreate={zting:0,ztai:0,crk:0,sbqf:0,kfsb:0,date:''};
+    var xzsbjcopreate={zhjk:0,ibp:0,date:''};
+    var zzxsjlopreate={glyf:0,sbqtd:0,wb:0,crk:0,dxss:0,zzsb:0,dft:0,ztm:0,afc:0,ckxw:0,gwjl:0,date:''};
+    var conditional=0;
+
+    //表格单元格宽度比例
+    var xzxsjlratio=[2,1,1,1,2,2,2,2,2,1,1];
+    var xzsbjcratio=[2,1,1,1,3,2,1,1];
+    var xzqtsjratio=[3,2,2,2,2,2,1];
+    var zzqtsjratio=[3,2,2,2,2,2,1];
+    var zzxsjlratio=[4,1,1,1,2,2,2,2,3,4,2,2,2,2,2,1];
+    // 初始化
+    $(function(){
+        console.log(window.location.href);
+        requestXZxsjlDate();
+        requestXZsbjcDate();
+        requestXZqtsjDate();
+        requestZZxsjlDate();
+        requestZZqtsjDate();
+        inittdwidth();
+    })
+    function inittdwidth(){
+        for(var i=0;i<xzxsjlratio.length;i++){
+            // $("#xzxsjlhead th").eq(i+1).css('flex',xzxsjlratio[i]);
+            $("#xzxsjlhead th").eq(i+1).attr('style','flex:'+xzxsjlratio[i]);
+        }
+        for(var i=0;i<xzsbjcratio.length;i++){
+            // $("#xzsbjchead th").eq(i+1).css('flex',xzsbjcratio[i]);
+            $("#xzsbjchead th").eq(i+1).attr('style','flex:'+xzsbjcratio[i]);
+        }
+        for(var i=0;i<xzqtsjratio.length;i++){
+            // $("#xzqtsjhead th").eq(i+1).css('flex',xzqtsjratio[i]);
+            $("#xzqtsjhead th").eq(i+1).attr('style','flex:'+xzqtsjratio[i]);
+        }
+        for(var i=0;i<zzqtsjratio.length;i++){
+            // $("#zzqtsjhead th").eq(i+1).css('flex',zzqtsjratio[i]);
+            $("#zzqtsjhead th").eq(i+1).attr('style','flex:'+zzqtsjratio[i]);
+        }
+        for(var i=0;i<zzxsjlratio.length;i++){
+            // $("#zzxsjlhead th").eq(i+1).css('flex',zzxsjlratio[i]);
+            $("#zzxsjlhead th").eq(i+1).attr('style','flex:'+zzxsjlratio[i]);
+        }
+    }
+    function requestXZxsjlDate(){
+        console.log(window.location.protocol+'//'+window.location.host+'/InspectionRecord-1.0/xz/getpatrolrecordinfos')
+        $.ajax({
+            url:window.location.protocol+'//'+window.location.host+'/InspectionRecord-1.0/xz/getpatrolrecordinfos',
+            type:'GET',
+            dataType:'TEXT',
+            success:function(data){
+                var newData=JSON.parse(data);
+                initXZxsjldata(newData);
+                console.log(newData[0]);
+            }
+        })
+    }
+    function requestXZsbjcDate(){
+        console.log(window.location.protocol+'//'+window.location.host+'/InspectionRecord-1.0/xz/getequipinspections')
+        $.ajax({
+            url:window.location.protocol+'//'+window.location.host+'/InspectionRecord-1.0/xz/getequipinspections',
+            type:'GET',
+            dataType:'TEXT',
+            success:function(data){
+                var newData=JSON.parse(data);
+                initXZsbjcdata(newData);
+                console.log(newData[0]);
+            }
+        })
+    }
+    function requestXZqtsjDate(){
+        console.log(window.location.protocol+'//'+window.location.host+'/InspectionRecord-1.0/xz/getotherevents')
+        $.ajax({
+            url:window.location.protocol+'//'+window.location.host+'/InspectionRecord-1.0/xz/getotherevents',
+            type:'GET',
+            dataType:'TEXT',
+            success:function(data){
+                var newData=JSON.parse(data);
+                initXZqtsjdata(newData);
+                console.log(newData[0]);
+            }
+        })
+    }
+    function requestZZxsjlDate(){
+        console.log(window.location.protocol+'//'+window.location.host+'/InspectionRecord-1.0/zz/getpatrolrecordinfos')
+        $.ajax({
+            url:window.location.protocol+'//'+window.location.host+'/InspectionRecord-1.0/zz/getpatrolrecordinfos',
+            type:'GET',
+            dataType:'TEXT',
+            success:function(data){
+                var newData=JSON.parse(data);
+                initZZxsjldata(newData);
+                console.log(newData[0]);
+            }
+        })
+    }
+    function requestZZqtsjDate(){
+        console.log(window.location.protocol+'//'+window.location.host+'/InspectionRecord-1.0/zz/getotherevents')
+        $.ajax({
+            url:window.location.protocol+'//'+window.location.host+'/InspectionRecord-1.0/zz/getotherevents',
+            type:'GET',
+            dataType:'TEXT',
+            success:function(data){
+                var newData=JSON.parse(data);
+                initZZqtsjdata(newData);
+                console.log(newData[0]);
+            }
+        })
+    }
+    function initXZxsjldata(data){
+        html = '';
+        for(var i=0;i<data.length;i++){
+            var sum=-1;
+            html += '<tr style="display: flex">';
+            html += '<td style="width: 40px"><input type="checkbox" onclick="gouxzxsjl(this)"></td>'
+            var mark=0;
+            $.each(data[i],function(key,value){
+                if(key==='t_operate'){
+                    mark=value;
+                }
+            })
+            $.each(data[i],function(key,value){
+                if(key==='t_id'){
+                    // console.log("1");
+                }else if(key==='t_station_hall'||key==='t_platform'||key==='t_exit'||key==='t_equip_room'||key==='t_customer_equip'){
+                    sum++;
+                    if(value===0){
+                        html += '<td style="flex: '+xzxsjlratio[sum]+'"><button style="margin-right:10px" onclick="xzxsjldyes(this,'+key+')">yes</button><button style="margin-left:10px" onclick="xzxsjldno(this,'+key+')">no</button></td>'
+                    }else if(value===1){
+                        html += '<td style="flex: '+xzxsjlratio[sum]+'"><button style="color:aqua;margin-right:10px">yes</button><button style="margin-left:10px">no</button></td>'
+                    }else{
+                        html += '<td style="flex: '+xzxsjlratio[sum]+'"><button style="margin-right:10px">yes</button><button style="color:aqua;margin-left:10px">no</button></td>'
+                    }
+                }else if(key==='t_operate'){
+                    sum++;
+                    if(value===0){
+                        html += '<td style="flex: '+xzxsjlratio[sum]+'"><button onclick="xzxsjlok(this)">确定</button></td>'
+                    }else{
+                        html += '<td style="flex: '+xzxsjlratio[sum]+'"><button style="color:aqua">确定</button></td>'
+                    }
+                }else if(key==='t_remarks'){
+                    sum++;
+                    if(mark===1){
+                        html += '<td style="flex: '+xzxsjlratio[sum]+'"><span style="pointer-events: none;">'+value+'</span></td>'
+                    }else{
+                        html += '<td style="flex: '+xzxsjlratio[sum]+'"><span style="cursor: pointer;" onclick="xzxsjlbjshow(this)">点击编辑</span></td>'
+                    }
+
+                }else{
+                    sum++;
+                    html += '<td style="flex: '+xzxsjlratio[sum]+'">'+value+'</td>'
+                }
+
+            })
+            html += '</tr>';
+        }
+        $('#xzxsjlbody').html(html)
+        console.log(html);
+        console.log("行值巡视记录初始化成功");
+    }
+    function initXZsbjcdata(data){
+        html = '';
+        for(var i=0;i<data.length;i++){
+            html += '<tr style="display: flex">';
+            html += '<td style="width: 40px"><input type="checkbox" onclick="gouxzsbjc(this)"></td>'
+            var mark=0;
+            $.each(data[i],function(key,value){
+                if(key==='t_operate'){
+                    mark=value;
+                }
+            })
+            var sum=-1;
+            $.each(data[i],function(key,value){
+                if(key==='t_id'){
+                    console.log("1");
+                }else if(key==='t_integrated_monitoring'||key==='t_ibp'){
+                    sum++;
+                    if(value===0){
+                        html += '<td style="flex: '+xzsbjcratio[sum]+'"><button style="margin-right:10px" onclick="xzsbjcdyes(this,'+key+')">yes</button><button style="margin-left:10px" onclick="xzsbjcdno(this,'+key+')">no</button></td>'
+                    }else if(value===1){
+                        html += '<td style="flex: '+xzsbjcratio[sum]+'"><button style="color:aqua;margin-right:10px">yes</button><button style="margin-left:10px">no</button></td>'
+                    }else{
+                        html += '<td style="flex: '+xzsbjcratio[sum]+'"><button style="margin-right:10px">yes</button><button style="color:aqua;margin-left:10px">no</button></td>'
+                    }
+                }else if(key==='t_operate'){
+                    sum++;
+                    if(value===0){
+                        html += '<td style="flex: '+xzsbjcratio[sum]+'"><button onclick="xzsbjcok(this)">确定</button></td>'
+                    }else{
+                        html += '<td style="flex: '+xzsbjcratio[sum]+'"><button style="color:aqua">确定</button></td>'
+                    }
+                }else if(key==='t_remarks'){
+                    sum++;
+                    if(mark===1){
+                        html += '<td style="flex: '+xzsbjcratio[sum]+'"><span style="pointer-events: none;">'+value+'</span></td>'
+                    }else{
+                        html += '<td style="flex: '+xzsbjcratio[sum]+'"><span style="cursor: pointer;" onclick="xzsbjcbjshow(this)">点击编辑</span></td>'
+                    }
+                }else{
+                    sum++;
+                    html += '<td style="flex: '+xzsbjcratio[sum]+'">'+value+'</td>'
+                }
+
+            })
+            html += '</tr>';
+        }
+        $('#xzsbjcbody').html(html)
+        console.log("行值设备检查初始化成功");
+    }
+    function initXZqtsjdata(data){
+        html = '';
+        for(var i=0;i<data.length;i++){
+            html += '<tr style="display: flex">';
+            html += '<td style="width: 40px"><input type="checkbox" onclick="gouxzqtsj(this)"></td>'
+            var mark=0;
+            $.each(data[i],function(key,value){
+                if(key==='t_operate'){
+                    mark=value;
+                }
+            })
+            var sum=-1;
+            $.each(data[i],function(key,value){
+                if(key==='t_id'){
+                    console.log("1");
+                }else if(key==='t_operate'){
+                    sum++;
+                    if(value===0){
+                        html += '<td style="flex: '+xzqtsjratio[sum]+'"><button onclick="xzqtsjok(this)">确定</button></td>'
+                    }else{
+                        html += '<td style="flex: '+xzqtsjratio[sum]+'"><button style="color:aqua">确定</button></td>'
+                    }
+                }else if(key==='t_event_description'||key==='t_camera_number'){
+                    sum++;
+                    if(mark===1){
+                        html += '<td style="flex:'+xzqtsjratio[sum]+'"><span style="pointer-events: none;">'+value+'</span></td>'
+                    }else{
+                        html += '<td style="flex: '+xzqtsjratio[sum]+'"><span style="cursor: pointer;" onclick="xzqtsjbjshow(this,'+key+')">点击编辑</span></td>'
+                        // html += '<td><span style="cursor: pointer;" onclick="xzsbjcbjshow(this)">点击编辑</span></td>'
+                    }
+                }else{
+                    sum++;
+                    html += '<td style="flex: '+xzqtsjratio[sum]+'">'+value+'</td>'
+                }
+
+            })
+            html += '</tr>';
+        }
+        $('#xzqtsjbody').html(html)
+        console.log("行值其他事件初始化成功");
+    }
+    function initZZqtsjdata(data){
+        html = '';
+        for(var i=0;i<data.length;i++){
+            html += '<tr style="display: flex">';
+            html += '<td style="width: 40px"><input type="checkbox" onclick="gouzzqtsj(this)"></td>'
+            var mark=0;
+            $.each(data[i],function(key,value){
+                if(key==='t_operate'){
+                    mark=value;
+                }
+            })
+            var sum=-1
+            $.each(data[i],function(key,value){
+
+                if(key==='t_id'){
+                    console.log("1");
+                }else if(key==='t_operate'){
+                    sum++;
+                    if(value===0){
+                        html += '<td style="flex: '+zzqtsjratio[sum]+'"><button onclick="zzqtsjok(this)">确定</button></td>'
+                    }else{
+                        html += '<td style="flex: '+zzqtsjratio[sum]+'"><button style="color:aqua">确定</button></td>'
+                    }
+                }else if(key==='t_event_description'||key==='t_camera_number'){
+                    sum++;
+                    if(mark===1){
+                        html += '<td style="flex: '+zzqtsjratio[sum]+'"><span style="pointer-events: none;">'+value+'</span></td>'
+                    }else{
+                        html += '<td style="flex: '+zzqtsjratio[sum]+'"><span style="cursor: pointer;" onclick="zzqtsjbjshow(this,'+key+')">点击编辑</span></td>'
+                        // html += '<td><span style="cursor: pointer;" onclick="xzsbjcbjshow(this)">点击编辑</span></td>'
+                    }
+
+                }else{
+                    sum++;
+                    html += '<td style="flex: '+zzqtsjratio[sum]+'">'+value+'</td>'
+                }
+
+            })
+            html += '</tr>';
+        }
+        $('#zzqtsjbody').html(html)
+        console.log("值站其他事件初始化成功");
+    }
+    function initZZxsjldata(data){
+        html = '';
+        for(var i=0;i<data.length;i++){
+            html += '<tr style="display: flex">';
+            html += '<td style="width: 40px"><input type="checkbox" onclick="gouzzxsjl(this)"></td>'
+            var sum=-1;
+            $.each(data[i],function(key,value){
+
+                if(key==='t_id'){
+                    console.log("1");
+                }else if(key==='t_manage_room'||key==='t_equipment_channel'||key==='t_enclosure'||key==='t_exit'||key==='t_guiding_facilities'||key==='t_selfservice_equip'||key==='t_escalator'||key==='t_platform_door'||key==='t_turnstile'||key==='t_passenger_behavior'||key==='t_post_discipline'){
+                    sum++;
+                    if(value===0){
+                        html += '<td style="flex: '+zzxsjlratio[sum]+'"><button style="margin-right:2px" onclick="zzxsjldyes(this,'+key+')">yes</button><button style="margin-left:2px" onclick="zzxsjldno(this,'+key+')">no</button></td>'
+                    }else if(value===1){
+                        html += '<td style="flex: '+zzxsjlratio[sum]+'"><button style="color:aqua;margin-right:2px">yes</button><button style="margin-left:2px">no</button></td>'
+                    }else{
+                        html += '<td style="flex: '+zzxsjlratio[sum]+'"><button style="margin-right:2px">yes</button><button style="color:aqua;margin-left:2px">no</button></td>'
+                    }
+                }else if(key==='t_operate'){
+                    sum++;
+                    if(value===0){
+                        html += '<td style="flex: '+zzxsjlratio[sum]+'"><button onclick="zzxsjlok(this)">确定</button></td>'
+                    }else{
+                        html += '<td style="flex: '+zzxsjlratio[sum]+'"><button style="color:aqua">确定</button></td>'
+                    }
+                }else{
+                    sum++;
+                    html += '<td style="flex: '+zzxsjlratio[sum]+'">'+value+'</td>'
+                }
+
+            })
+            html += '</tr>';
+        }
+        $('#zzxsjlbody').html(html)
+        console.log("值站巡视记录初始化成功");
+    }
+    // 初始化
+
+
+
+
+    // 新增框s
+    function xzxsjlTC(){
+        $("#xzxsjltime").val("");
+        $("#xzxsjladdinfo").css('display','flex')
+    }
+    function xzsbjcTC(){
+        $("#xzsbjctime").val("");
+        $("#xzsbjcaddinfo").css('display','flex')
+    }
+    function xzqtsjTC(){
+        $("#xzqtsjtime").val("");
+        $("#xzqtsjaddinfo").css('display','flex')
+    }
+    function zzxsjlTC(){
+        $("#zzxsjltime").val("");
+        $("#zzxsjladdinfo").css('display','flex')
+    }
+    function zzqtsjTC(){
+        $("#zzqtsjtime").val("");
+        $("#zzqtsjaddinfo").css('display','flex')
+    }
+    function yingchangTC(){
+        $("#xzxsjladdinfo").css('display','none')
+        $("#xzsbjcaddinfo").css('display','none')
+        $("#xzqtsjaddinfo").css('display','none')
+        $("#zzxsjladdinfo").css('display','none')
+        $("#zzqtsjaddinfo").css('display','none')
+    }
+    // 新增框
+
+
+
+    // 编辑框
+    function xzxsjlbjshow(obj){
+        $('#xzxsjlbjwbk #xzxsjlbjtitle').text($(obj).parent().parent().find('td:eq(2)').text()+':'+$(obj).parent().parent().find('td:eq(4)').text())
+        $('#xzxsjlbjwbk').css('display','block');
+        // console.log($(obj).parent().parent().find('td:eq(10)').find('span'));
+        // $(obj).parent().parent().find('td:eq(10)').find('span').css('pointer-events','none');
+        bjjltime=$(obj).parent().parent().find('td:eq(1)').text();
+        $.ajax({
+            url:window.location.protocol+'//'+window.location.host+'/InspectionRecord-1.0/xz/getInfoByDate/'+$(obj).parent().parent().find('td:eq(1)').text(),
+            type:'GET',
+            dataType:'TEXT',
+            success:function(data){
+                // console.log("success");
+                $('#xzxsjlbjwbk textarea').attr('placeholder',data)
+            }
+        })
+    }
+    function xzsbjcbjshow(obj){
+        $('#xzsbjcbjwbk #xzsbjcbjtitle').text($(obj).parent().parent().find('td:eq(2)').text()+':'+$(obj).parent().parent().find('td:eq(4)').text())
+        $('#xzsbjcbjwbk').css('display','block');
+        // $(obj).parent().parent().find('td:eq(2)').find('span').css('pointer-events:none');
+        bjjltime=$(obj).parent().parent().find('td:eq(1)').text();
+        $.ajax({
+            url:window.location.protocol+'//'+window.location.host+'/InspectionRecord-1.0/xz/getsbjcInfoByDate/'+$(obj).parent().parent().find('td:eq(1)').text(),
+            type:'GET',
+            dataType:'TEXT',
+            success:function(data){
+                // console.log("success");
+                $('#xzsbjcbjwbk textarea').attr('placeholder',data)
+            }
+        })
+    }
+    function xzqtsjbjshow(obj,key){
+
+        if(key==='t_event_description'){
+            $('#xzqtsjbjwbk #xzqtsjbjtitle').text($(obj).parent().parent().find('td:eq(2)').text()+':'+$(obj).parent().parent().find('td:eq(4)').text())
+            $('#xzqtsjbjwbk').css('display','block');
+            $(obj).parent().parent().find('td:eq(2)').find('span').css('pointer-events:none');
+            bjjltime=$(obj).parent().parent().find('td:eq(1)').text();
+            $.ajax({
+                url:window.location.protocol+'//'+window.location.host+'/InspectionRecord-1.0/xz/getqtsjInfoByDate/'+$(obj).parent().parent().find('td:eq(1)').text(),
+                type:'GET',
+                dataType:'TEXT',
+                success:function(data){
+                    // console.log("success");
+                    data=JSON.parse(data);
+                    console.log(data.t_event_description);
+                    $('#xzqtsjbjwbk textarea').attr('placeholder',data.t_event_description)
+                    // $('#xzqtsjbjwbk textarea').val(data.t_event_description)
+                }
+            })
+        }else if(key==='t_camera_number'){
+            console.log('chufale');
+            $('#xzqtsjbjwbk2 #xzqtsjbjtitle2').text($(obj).parent().parent().find('td:eq(2)').text()+':'+$(obj).parent().parent().find('td:eq(4)').text())
+            $('#xzqtsjbjwbk2').css('display','block');
+            $(obj).parent().parent().find('td:eq(2)').find('span').css('pointer-events:none');
+            bjjltime=$(obj).parent().parent().find('td:eq(1)').text();
+            $.ajax({
+                url:window.location.protocol+'//'+window.location.host+'/InspectionRecord-1.0/xz/getqtsjInfoByDate/'+$(obj).parent().parent().find('td:eq(1)').text(),
+                type:'GET',
+                dataType:'TEXT',
+                success:function(data){
+                    data=JSON.parse(data);
+                    console.log(data.t_camera_number);
+                    $('#xzqtsjbjwbk2 textarea').attr('placeholder',data.t_camera_number)
+
+                }
+            })
+        }
+    }
+    function zzqtsjbjshow(obj,key){
+
+        if(key==='t_event_description'){
+            $('#zzqtsjbjwbk #zzqtsjbjtitle').text($(obj).parent().parent().find('td:eq(2)').text()+':'+$(obj).parent().parent().find('td:eq(4)').text())
+            $('#zzqtsjbjwbk').css('display','block');
+            bjjltime=$(obj).parent().parent().find('td:eq(1)').text();
+            $.ajax({
+                url:window.location.protocol+'//'+window.location.host+'/InspectionRecord-1.0/zz/getqtsjInfoByDate/'+$(obj).parent().parent().find('td:eq(1)').text(),
+                type:'GET',
+                dataType:'TEXT',
+                success:function(data){
+                    data=JSON.parse(data);
+                    console.log(data.t_event_description);
+                    $('#zzqtsjbjwbk textarea').attr('placeholder',data.t_event_description)
+                }
+            })
+        }else if(key==='t_camera_number'){
+            console.log('chufale');
+            $('#zzqtsjbjwbk2 #zzqtsjbjtitle2').text($(obj).parent().parent().find('td:eq(2)').text()+':'+$(obj).parent().parent().find('td:eq(4)').text())
+            $('#zzqtsjbjwbk2').css('display','block');
+            bjjltime=$(obj).parent().parent().find('td:eq(1)').text();
+            $.ajax({
+                url:window.location.protocol+'//'+window.location.host+'/InspectionRecord-1.0/zz/getqtsjInfoByDate/'+$(obj).parent().parent().find('td:eq(1)').text(),
+                type:'GET',
+                dataType:'TEXT',
+                success:function(data){
+                    data=JSON.parse(data);
+                    console.log(data.t_camera_number);
+                    $('#zzqtsjbjwbk2 textarea').attr('placeholder',data.t_camera_number)
+                }
+            })
+        }
+    }
+    function yingchangBJ(){
+        $('#xzxsjlbjwbk').css('display','none');
+        $('#xzsbjcbjwbk').css('display','none');
+        $('#xzqtsjbjwbk').css('display','none');
+        $('#xzqtsjbjwbk2').css('display','none');
+        $('#zzxsjlbjwbk').css('display','none');
+        $('#zzqtsjbjwbk').css('display','none');
+        $('#zzqtsjbjwbk2').css('display','none');
+    }
+    function xzxsjlbjupd(){
+        $.ajax({
+            url:window.location.protocol+'//'+window.location.host+'/InspectionRecord-1.0/xz/updpatrolrecordremark/'+$('#xzxsjlbjwbk textarea').val()+'/'+bjjltime,
+            type:'POST',
+            dataType:'TEXT',
+            success : function(data){
+                if(data==='success'){
+                    $('#xzxsjlbjwbk').css('display','none');
+                    console.log('编辑框保存成功');
+                }
+            }
+        })
+    }
+    function xzsbjcbjupd(){
+        $.ajax({
+            url:window.location.protocol+'//'+window.location.host+'/InspectionRecord-1.0/xz/updequipinspectionremark/'+$('#xzsbjcbjwbk textarea').val()+'/'+bjjltime,
+            type:'POST',
+            dataType:'TEXT',
+            success : function(data){
+                if(data==='success'){
+                    $('#xzsbjcbjwbk').css('display','none');
+                    console.log('编辑框保存成功');
+                }
+            }
+        })
+    }
+
+    function xzqtsjbjupd(){
+        $.ajax({
+            url:window.location.protocol+'//'+window.location.host+'/InspectionRecord-1.0/xz/updothereventsjms/'+$('#xzqtsjbjwbk textarea').val()+'/'+bjjltime,
+            type:'POST',
+            dataType:'TEXT',
+            success : function(data){
+                if(data==='success'){
+                    $('#xzqtsjbjwbk').css('display','none');
+                    console.log('编辑框保存成功');
+                }
+            }
+        })
+    }
+
+    function xzqtsjbjupd2(){
+        $.ajax({
+            url:window.location.protocol+'//'+window.location.host+'/InspectionRecord-1.0/xz/updothereventsxjbh/'+$('#xzqtsjbjwbk2 textarea').val()+'/'+bjjltime,
+            type:'POST',
+            dataType:'TEXT',
+            success : function(data){
+                if(data==='success'){
+                    $('#xzqtsjbjwbk2').css('display','none');
+                    console.log('编辑框保存成功');
+                }
+            }
+        })
+    }
+
+    function zzqtsjbjupd(){
+        $.ajax({
+            url:window.location.protocol+'//'+window.location.host+'/InspectionRecord-1.0/zz/updothereventsjms/'+$('#zzqtsjbjwbk textarea').val()+'/'+bjjltime,
+            type:'POST',
+            dataType:'TEXT',
+            success : function(data){
+                if(data==='success'){
+                    $('#zzqtsjbjwbk').css('display','none');
+                    console.log('编辑框保存成功');
+                }
+            }
+        })
+    }
+
+    function zzqtsjbjupd2(){
+        $.ajax({
+            url:window.location.protocol+'//'+window.location.host+'/InspectionRecord-1.0/zz/updothereventsxjbh/'+$('#zzqtsjbjwbk2 textarea').val()+'/'+bjjltime,
+            type:'POST',
+            dataType:'TEXT',
+            success : function(data){
+                if(data==='success'){
+                    $('#zzqtsjbjwbk2').css('display','none');
+                    console.log('编辑框保存成功');
+                }
+            }
+        })
+    }
+    // 编辑框
+
+
+
+    // 按钮确认
+    function xzxsjldyes(obj,val){
+        $(obj).css('color','aqua');
+        xzxsjlopreate.date=$(obj).parent().parent().find('td:eq(1)').text();
+        if(val==='t_station_hall'){
+            xzxsjlopreate.zting=1;
+        }else if(val==='t_platform'){
+            xzxsjlopreate.ztai=1;
+        }else if(val==='t_exit'){
+            xzxsjlopreate.crk=1;
+        }else if(val==='t_equip_room'){
+            xzxsjlopreate.sbqf=1;
+        }else if(val==='t_customer_equip'){
+            xzxsjlopreate.kfsb=1;
+        }
+        console.log(xzxsjlopreate);
+    }
+    function xzxsjldno(obj,val){
+        $(obj).css('color','aqua');
+        xzxsjlopreate.date=$(obj).parent().parent().find('td:eq(1)').text();
+        if(val==='t_station_hall'){
+            xzxsjlopreate.zting=2;
+        }else if(val==='t_platform'){
+            xzxsjlopreate.ztai=2;
+        }else if(val==='t_exit'){
+            xzxsjlopreate.crk=2;
+        }else if(val==='t_equip_room'){
+            xzxsjlopreate.sbqf=2;
+        }else if(val==='t_customer_equip'){
+            xzxsjlopreate.kfsb=2;
+        }
+        console.log(xzxsjlopreate);
+    }
+
+    function xzsbjcdyes(obj,val){
+        $(obj).css('color','aqua');
+        xzsbjcopreate.date=$(obj).parent().parent().find('td:eq(1)').text();
+        if(val==='t_integrated_monitoring'){
+            xzsbjcopreate.zhjk=1;
+        }else if(val==='t_ibp'){
+            xzsbjcopreate.ibp=1;
+        }
+        console.log(xzsbjcopreate);
+    }
+    function xzsbjcdno(obj,val){
+        $(obj).css('color','aqua');
+        xzsbjcopreate.date=$(obj).parent().parent().find('td:eq(1)').text();
+        if(val==='t_integrated_monitoring'){
+            xzsbjcopreate.zhjk=2;
+        }else if(val==='t_ibp'){
+            xzsbjcopreate.ibp=2;
+        }
+        console.log(xzsbjcopreate);
+    }
+    // {glyf:0,sbqtd:0,wb:0,crk:0,dxss:0,zzsb:0,dft:0,ztm:0,afc:0,ckxw:0,gwjl:0,date:''};
+    function zzxsjldyes(obj,val){
+        $(obj).css('color','aqua');
+        zzxsjlopreate.date=$(obj).parent().parent().find('td:eq(1)').text();
+        if(val==='t_manage_room'){
+            zzxsjlopreate.glyf=1;
+        }else if(val==='t_equipment_channel'){
+            zzxsjlopreate.sbqtd=1;
+        }else if(val==='t_enclosure'){
+            zzxsjlopreate.wb=1;
+        }else if(val==='t_exit'){
+            zzxsjlopreate.crk=1;
+        }else if(val==='t_guiding_facilities'){
+            zzxsjlopreate.dxss=1;
+        }else if(val==='t_selfservice_equip'){
+            zzxsjlopreate.zzsb=1;
+        }else if(val==='t_escalator'){
+            zzxsjlopreate.dft=1;
+        }else if(val==='t_platform_door'){
+            zzxsjlopreate.ztm=1;
+        }else if(val==='t_turnstile'){
+            zzxsjlopreate.afc=1;
+        }else if(val==='t_passenger_behavior'){
+            zzxsjlopreate.ckxw=1;
+        }else if(val==='t_post_discipline'){
+            zzxsjlopreate.gwjl=1;
+        }
+        console.log(zzxsjlopreate);
+    }
+    function zzxsjldno(obj,val){
+        $(obj).css('color','aqua');
+        zzxsjlopreate.date=$(obj).parent().parent().find('td:eq(1)').text();
+        if(val==='t_manage_room'){
+            zzxsjlopreate.glyf=2;
+        }else if(val==='t_equipment_channel'){
+            zzxsjlopreate.sbqtd=2;
+        }else if(val==='t_enclosure'){
+            zzxsjlopreate.wb=2;
+        }else if(val==='t_exit'){
+            zzxsjlopreate.crk=2;
+        }else if(val==='t_guiding_facilities'){
+            zzxsjlopreate.dxss=2;
+        }else if(val==='t_selfservice_equip'){
+            zzxsjlopreate.zzsb=2;
+        }else if(val==='t_escalator'){
+            zzxsjlopreate.dft=2;
+        }else if(val==='t_platform_door'){
+            zzxsjlopreate.ztm=2;
+        }else if(val==='t_turnstile'){
+            zzxsjlopreate.afc=2;
+        }else if(val==='t_passenger_behavior'){
+            zzxsjlopreate.ckxw=2;
+        }else if(val==='t_post_discipline'){
+            zzxsjlopreate.gwjl=2;
+        }
+        console.log(zzxsjlopreate);
+    }
+    // 按钮确认
+
+
+
+    // 模块切换
+    function zwchange(){
+        console.log($('#zwselect').val());
+        if($('#zwselect').val()==='值班站长'){
+            conditional=1;
+            $("#change-ditu1").css('display','none');
+            $("#change-ditu2").css('display','block');
+        }
+        if($('#zwselect').val()==='行车值班员'){
+            conditional=0;
+            $("#change-ditu1").css('display','block');
+            $("#change-ditu2").css('display','none');
+        }
+    }
+    // 模块切换
+
+
+
+    // 单选
+    function gouxzxsjl(obj){
+        if(obj.checked){
+            xzxsjlarr.push($(obj).parent().parent().find('td:eq(1)').text());
+            console.log(xzxsjlarr);
+        }else{
+            xzxsjlarr.pop($(obj).parent().parent().find('td:eq(1)').text());
+            console.log(xzxsjlarr);
+        }
+    }
+    function gouxzsbjc(obj){
+        if(obj.checked){
+            xzsbjcarr.push($(obj).parent().parent().find('td:eq(1)').text());
+            console.log(xzsbjcarr);
+        }else{
+            xzsbjcarr.pop($(obj).parent().parent().find('td:eq(1)').text());
+            console.log(xzsbjcarr);
+        }
+    }
+    function gouxzqtsj(obj){
+        if(obj.checked){
+            xzqtsjarr.push($(obj).parent().parent().find('td:eq(1)').text());
+            console.log(xzqtsjarr);
+        }else{
+            xzqtsjarr.pop($(obj).parent().parent().find('td:eq(1)').text());
+            console.log(xzqtsjarr);
+        }
+    }
+    function gouzzxsjl(obj){
+        if(obj.checked){
+            zzxsjlarr.push($(obj).parent().parent().find('td:eq(1)').text());
+            console.log(zzxsjlarr);
+        }else{
+            zzxsjlarr.pop($(obj).parent().parent().find('td:eq(1)').text());
+            console.log(zzxsjlarr);
+        }
+    }
+    function gouzzqtsj(obj){
+        if(obj.checked){
+            zzqtsjarr.push($(obj).parent().parent().find('td:eq(1)').text());
+            console.log(zzqtsjarr);
+        }else{
+            zzqtsjarr.pop($(obj).parent().parent().find('td:eq(1)').text());
+            console.log(zzqtsjarr);
+        }
+    }
+    // 单选
+
+
+
+
+    // 全选功能
+    function selectallxzqtsj(obj){
+        if($(obj).prop('checked')){
+            for(var i=0;i<$('#xzqtsjbody').find('tr').length;i++){
+                if(!$('#xzqtsjbody').find('input:eq('+i+')').prop('checked')){
+                    $('#xzqtsjbody').find('input:eq('+i+')').prop('checked',true);
+                    xzqtsjarr.push($('#xzqtsjbody').find('tr:eq('+i+')').find('td:eq(1)').text());
+                    console.log(xzqtsjarr);
+                }
+
+            }
+        }else{
+            for(var j=0;j<=$('#xzqtsjbody').find('tr').length;j++){
+                if($('#xzqtsjbody').find('input:eq('+j+')').prop('checked')){
+                    $('#xzqtsjbody').find('input:eq('+j+')').prop('checked',false);
+                    xzqtsjarr.pop($('#xzqtsjbody').find('tr:eq('+j+')').find('td:eq(1)').text());
+                    console.log(xzqtsjarr);
+                }
+                // $('#xzqtsjbody').find('input:eq('+j+')').prop('checked',false);
+            }
+        }
+    }
+    function selectallxzsbjc(obj){
+        if($(obj).prop('checked')){
+            for(var i=0;i<$('#xzsbjcbody').find('tr').length;i++){
+                if(!$('#xzsbjcbody').find('input:eq('+i+')').prop('checked')){
+                    $('#xzsbjcbody').find('input:eq('+i+')').prop('checked',true);
+                    xzsbjcarr.push($('#xzsbjcbody').find('tr:eq('+i+')').find('td:eq(1)').text());
+                    console.log(xzsbjcarr);
+                }
+                // $('#xzsbjcbody').find('input:eq('+i+')').prop('checked',true);
+            }
+        }else{
+            for(var j=0;j<=$('#xzsbjcbody').find('tr').length;j++){
+                if($('#xzsbjcbody').find('input:eq('+j+')').prop('checked')){
+                    $('#xzsbjcbody').find('input:eq('+j+')').prop('checked',false);
+                    xzsbjcarr.pop($('#xzsbjcbody').find('tr:eq('+j+')').find('td:eq(1)').text());
+                    console.log(xzsbjcarr);
+                }
+                // $('#xzsbjcbody').find('input:eq('+j+')').prop('checked',false);
+            }
+        }
+    }
+    function selectallxzxsjl(obj){
+        if($(obj).prop('checked')){
+            for(var i=0;i<$('#xzxsjlbody').find('tr').length;i++){
+                if(!$('#xzxsjlbody').find('input:eq('+i+')').prop('checked')){
+                    $('#xzxsjlbody').find('input:eq('+i+')').prop('checked',true);
+                    xzxsjlarr.push($('#xzxsjlbody').find('tr:eq('+i+')').find('td:eq(1)').text());
+                    console.log(xzxsjlarr);
+                }
+            }
+        }else{
+            for(var j=0;j<=$('#xzxsjlbody').find('tr').length;j++){
+                if($('#xzxsjlbody').find('input:eq('+j+')').prop('checked')){
+                    $('#xzxsjlbody').find('input:eq('+j+')').prop('checked',false);
+                    xzxsjlarr.pop($('#xzxsjlbody').find('tr:eq('+j+')').find('td:eq(1)').text());
+                    console.log(xzxsjlarr);
+                }
+            }
+        }
+    }
+    function selectallzzqtsj(obj){
+        if($(obj).prop('checked')){
+            for(var i=0;i<$('#zzqtsjbody').find('tr').length;i++){
+                if(!$('#zzqtsjbody').find('input:eq('+i+')').prop('checked')){
+                    $('#zzqtsjbody').find('input:eq('+i+')').prop('checked',true);
+                    zzqtsjarr.push($('#zzqtsjbody').find('tr:eq('+i+')').find('td:eq(1)').text());
+                    console.log(zzqtsjarr);
+                }
+                // $('#zzqtsjbody').find('input:eq('+i+')').prop('checked',true);
+            }
+        }else{
+            for(var j=0;j<=$('#zzqtsjbody').find('tr').length;j++){
+                if($('#zzqtsjbody').find('input:eq('+j+')').prop('checked')){
+                    $('#zzqtsjbody').find('input:eq('+j+')').prop('checked',false);
+                    zzqtsjarr.pop($('#zzqtsjbody').find('tr:eq('+j+')').find('td:eq(1)').text());
+                    console.log(zzqtsjarr);
+                }
+                // $('#zzqtsjbody').find('input:eq('+j+')').prop('checked',false);
+            }
+        }
+    }
+    function selectallzzxsjl(obj){
+        if($(obj).prop('checked')){
+            for(var i=0;i<$('#zzxsjlbody').find('tr').length;i++){
+                if(!$('#zzxsjlbody').find('input:eq('+i+')').prop('checked')){
+                    $('#zzxsjlbody').find('input:eq('+i+')').prop('checked',true);
+                    zzxsjlarr.push($('#zzxsjlbody').find('tr:eq('+i+')').find('td:eq(1)').text());
+                    console.log(zzxsjlarr);
+                }
+                // $('#zzxsjlbody').find('input:eq('+i+')').prop('checked',true);
+            }
+        }else{
+            for(var j=0;j<=$('#zzxsjlbody').find('tr').length;j++){
+                if($('#zzxsjlbody').find('input:eq('+j+')').prop('checked')){
+                    $('#zzxsjlbody').find('input:eq('+j+')').prop('checked',false);
+                    zzxsjlarr.pop($('#zzxsjlbody').find('tr:eq('+j+')').find('td:eq(1)').text());
+                    console.log(zzxsjlarr);
+                }
+                // $('#zzxsjlbody').find('input:eq('+j+')').prop('checked',false);
+            }
+        }
+    }
+    // 全选功能
+
+
+    // 新增
+    function addxzxsjlinfo(){
+        var xsjltime=$('#xzxsjltime').val();
+        var xsjlpost=$('#xzxsjlpost').val();
+        var xsjlclass=$('#xzxsjlclass').val();
+        var xsjlname=$('#xzxsjlname').val();
+        console.log(xsjltime+':'+xsjlpost+':'+xsjlclass+':'+xsjlname);
+        if(xsjltime==''||xsjlpost==''||xsjlclass==''||xsjlname==''){
+            alert('不能有空值')
+        }else{
+            $.ajax({
+                url:window.location.protocol+'//'+window.location.host+'/InspectionRecord-1.0/xz/addpatrolrecord/'+xsjltime+'/'+xsjlpost+'/'+xsjlclass+'/'+xsjlname,
+                type:'POST',
+                dataType:'TEXT',
+                success:function(data){
+                    if(data==='success'){
+                        requestXZxsjlDate();
+                        console.log('新增巡视记录成功...');
+                    }
+                }
+            })
+            $("#xzxsjladdinfo").css('display','none')
+        }
+    }
+
+    function addxzsbjcinfo(){
+        var sbjctime=$('#xzsbjctime').val();
+        var sbjcpost=$('#xzsbjcpost').val();
+        var sbjcclass=$('#xzsbjcclass').val();
+        var sbjcname=$('#xzsbjcname').val();
+        console.log(sbjctime+':'+sbjcpost+':'+sbjcclass+':'+sbjcname);
+        if(sbjctime==''||sbjcpost==''||sbjcclass==''||sbjcname==''){
+            alert('不能有空值')
+        }else{
+            $.ajax({
+                url:window.location.protocol+'//'+window.location.host+'/InspectionRecord-1.0/xz/addequipinspection/'+sbjctime+'/'+sbjcpost+'/'+sbjcclass+'/'+sbjcname,//t_xz_equipinspection
+                type:'POST',
+                dataType:'TEXT',
+                success:function(data){
+                    if(data==='success'){
+                        requestXZsbjcDate();
+                        console.log('新增设备检查记录成功...');
+                    }
+                }
+            })
+            $("#xzsbjcaddinfo").css('display','none')
+        }
+    }
+
+    function addxzqtsjinfo(){
+        var qtsjtime=$('#xzqtsjtime').val();
+        var qtsjpost=$('#xzqtsjpost').val();
+        var qtsjclass=$('#xzqtsjclass').val();
+        var qtsjname=$('#xzqtsjname').val();
+        console.log(qtsjtime+':'+qtsjpost+':'+qtsjclass+':'+qtsjname);
+        if(qtsjtime==''||qtsjpost==''||qtsjclass==''||qtsjname==''){
+            alert('不能有空值')
+        }else{
+            $.ajax({
+                url:window.location.protocol+'//'+window.location.host+'/InspectionRecord-1.0/xz/addotherevent/'+qtsjtime+'/'+qtsjpost+'/'+qtsjclass+'/'+qtsjname,
+                type:'POST',
+                dataType:'TEXT',
+                success:function(data){
+                    if(data==='success'){
+                        requestXZqtsjDate();
+                        console.log('新增巡视记录成功...');
+                    }
+                }
+            })
+            $("#xzqtsjaddinfo").css('display','none')
+        }
+    }
+
+    function addzzxsjlinfo(){
+        var xsjltime=$('#zzxsjltime').val();
+        var xsjlpost=$('#zzxsjlpost').val();
+        var xsjlclass=$('#zzxsjlclass').val();
+        var xsjlname=$('#zzxsjlname').val();
+        console.log(xsjltime+':'+xsjlpost+':'+xsjlclass+':'+xsjlname);
+        if(xsjltime==''||xsjlpost==''||xsjlclass==''||xsjlname==''){
+            alert('不能有空值')
+        }else{
+            $.ajax({
+                url:window.location.protocol+'//'+window.location.host+'/InspectionRecord-1.0/zz/addpatrolrecord/'+xsjltime+'/'+xsjlpost+'/'+xsjlclass+'/'+xsjlname,
+                type:'POST',
+                dataType:'TEXT',
+                success:function(data){
+                    if(data==='success'){
+                        requestZZxsjlDate();
+                        console.log('新增巡视记录成功...');
+                    }
+                }
+            })
+            $("#zzxsjladdinfo").css('display','none')
+        }
+    }
+
+    function addzzqtsjinfo(){
+        var qtsjtime=$('#zzqtsjtime').val();
+        var qtsjpost=$('#zzqtsjpost').val();
+        var qtsjclass=$('#zzqtsjclass').val();
+        var qtsjname=$('#zzqtsjname').val();
+        console.log(qtsjtime+':'+qtsjpost+':'+qtsjclass+':'+qtsjname);
+        if(qtsjtime==''||qtsjpost==''||qtsjclass==''||qtsjname==''){
+            alert('不能有空值')
+        }else{
+            $.ajax({
+                url:window.location.protocol+'//'+window.location.host+'/InspectionRecord-1.0/zz/addotherevent/'+qtsjtime+'/'+qtsjpost+'/'+qtsjclass+'/'+qtsjname,
+                type:'POST',
+                dataType:'TEXT',
+                success:function(data){
+                    if(data==='success'){
+                        requestZZqtsjDate();
+                        console.log('新增巡视记录成功...');
+                    }
+                }
+            })
+            $("#zzqtsjaddinfo").css('display','none')
+        }
+    }
+    // 新增
+
+
+    // 删除
+    function delxzxsjlinfo(){
+        if(xzxsjlarr.length===0){
+            alert('请勾选要删除的选项！！！')
+        }
+        $.ajax({
+            url:window.location.protocol+'//'+window.location.host+'/InspectionRecord-1.0/xz/delpatrolrecord/'+xzxsjlarr,
+            type:'GET',
+            dataType:'TEXT',
+            success:function(data){
+                if(data==='success'){
+                    xzxsjlarr=[];
+                    requestXZxsjlDate();
+                    console.log('删除巡视记录成功...');
+                }
+            }
+        })
+    }
+
+    function delxzsbjcinfo(){
+        if(xzsbjcarr.length===0){
+            alert('请勾选要删除的选项！！！')
+        }
+        $.ajax({
+            url:window.location.protocol+'//'+window.location.host+'/InspectionRecord-1.0/xz/delequipinspection/'+xzsbjcarr,
+            type:'GET',
+            dataType:'TEXT',
+            success:function(data){
+                if(data==='success'){
+                    xzsbjcarr=[];
+                    requestXZsbjcDate();
+                    console.log('删除巡视记录成功...');
+                }
+            }
+        })
+    }
+
+    function delxzqtsjinfo(){
+        if(xzqtsjarr.length===0){
+            alert('请勾选要删除的选项！！！')
+        }
+        $.ajax({
+            url:window.location.protocol+'//'+window.location.host+'/InspectionRecord-1.0/xz/delotherevent/'+xzqtsjarr,
+            type:'GET',
+            dataType:'TEXT',
+            success:function(data){
+                if(data==='success'){
+                    xzqtsjarr=[];
+                    requestXZqtsjDate();
+                    console.log('删除巡视记录成功...');
+                }
+            }
+        })
+    }
+
+    function delzzxsjlinfo(){
+        if(zzxsjlarr.length===0){
+            alert('请勾选要删除的选项！！！')
+        }
+        $.ajax({
+            url:window.location.protocol+'//'+window.location.host+'/InspectionRecord-1.0/zz/delpatrolrecord/'+zzxsjlarr,
+            type:'GET',
+            dataType:'TEXT',
+            success:function(data){
+                if(data==='success'){
+                    zzxsjlarr=[];
+                    requestZZxsjlDate();
+                    console.log('删除巡视记录成功...');
+                }
+            }
+        })
+    }
+
+    function delzzqtsjinfo(){
+        if(zzqtsjarr.length===0){
+            alert('请勾选要删除的选项！！！')
+        }
+        $.ajax({
+            url:window.location.protocol+'//'+window.location.host+'/InspectionRecord-1.0/zz/delotherevent/'+zzqtsjarr,
+            type:'GET',
+            dataType:'TEXT',
+            success:function(data){
+                if(data==='success'){
+                    zzqtsjarr=[];
+                    requestZZqtsjDate();
+                    console.log('删除巡视记录成功...');
+                }
+            }
+        })
+    }
+    // 删除
+
+
+
+    // 确认
+    function xzxsjlok(obj){
+        $(obj).css('color','aqua');
+        var qrtime=$(obj).parent().parent().find('td:eq(1)').text();
+        if(qrtime===xzxsjlopreate.date){
+            $.ajax({
+                url:window.location.protocol+'//'+window.location.host+'/InspectionRecord-1.0/xz/updpatrolrecord/'+xzxsjlopreate.zting+'/'+xzxsjlopreate.ztai+'/'+xzxsjlopreate.crk+'/'+xzxsjlopreate.sbqf+'/'+xzxsjlopreate.kfsb+'/'+xzxsjlopreate.date,
+                type:'POST',
+                dataType:'TEXT',
+                success:function(data){
+                    if(data==='success'){
+                        xzxsjlopreate.zting=0;
+                        xzxsjlopreate.ztai=0;
+                        xzxsjlopreate.crk=0;
+                        xzxsjlopreate.sbqf=0;
+                        xzxsjlopreate.kfsb=0;
+                        xzxsjlopreate.date='';
+                        requestXZxsjlDate();
+                        console.log("已确认巡视记录...");
+                    }
+                }
+            })
+        }else{
+            console.log('时间不一致，不做处理');
+        }
+    }
+
+    function xzsbjcok(obj){
+        $(obj).css('color','aqua');
+        var qrtime=$(obj).parent().parent().find('td:eq(1)').text();
+        if(qrtime===xzsbjcopreate.date){
+            $.ajax({
+                url:window.location.protocol+'//'+window.location.host+'/InspectionRecord-1.0/xz/updequipinspection/'+xzsbjcopreate.zhjk+'/'+xzsbjcopreate.ibp+'/'+xzsbjcopreate.date,
+                type:'POST',
+                dataType:'TEXT',
+                success:function(data){
+                    if(data==='success'){
+                        xzsbjcopreate.zhjk=0;
+                        xzsbjcopreate.ibp=0;
+                        xzsbjcopreate.date='';
+                        requestXZsbjcDate();
+                        console.log("已确认设备检查记录...");
+                    }
+                }
+            })
+        }else{
+            console.log('时间不一致，不做处理');
+        }
+    }
+
+    function zzxsjlok(obj){
+        $(obj).css('color','aqua');
+        var qrtime=$(obj).parent().parent().find('td:eq(1)').text();
+        if(qrtime===zzxsjlopreate.date){
+            $.ajax({
+                url:window.location.protocol+'//'+window.location.host+'/InspectionRecord-1.0/zz/updpatrolrecord/'+zzxsjlopreate.glyf+'/'+zzxsjlopreate.sbqtd+'/'+zzxsjlopreate.wb+'/'+zzxsjlopreate.crk+'/'+zzxsjlopreate.dxss+'/'+zzxsjlopreate.zzsb+'/'+zzxsjlopreate.dft+'/'+zzxsjlopreate.ztm+'/'+zzxsjlopreate.afc+'/'+zzxsjlopreate.ckxw+'/'+zzxsjlopreate.gwjl+'/'+zzxsjlopreate.date,
+                type:'POST',
+                dataType:'TEXT',
+                success:function(data){
+                    if(data==='success'){
+                        zzxsjlopreate.glyf=0;
+                        zzxsjlopreate.sbqtd=0;
+                        zzxsjlopreate.wb=0;
+                        zzxsjlopreate.crk=0;
+                        zzxsjlopreate.dxss=0;
+                        zzxsjlopreate.zzsb=0;
+                        zzxsjlopreate.dft=0;
+                        zzxsjlopreate.ztm=0;
+                        zzxsjlopreate.afc=0;
+                        zzxsjlopreate.ckxw=0;
+                        zzxsjlopreate.gwjl=0;
+                        zzxsjlopreate.date='';
+                        requestZZxsjlDate();
+                        console.log("已确认巡视记录...");
+                    }
+                }
+            })
+        }else{
+            console.log('时间不一致，不做处理');
+        }
+    }
+    function xzqtsjok(obj){
+        $(obj).css('color','aqua');
+        var qrtime=$(obj).parent().parent().find('td:eq(1)').text();
+        $.ajax({
+            url:window.location.protocol+'//'+window.location.host+'/InspectionRecord-1.0/xz/updqtsj/'+qrtime,
+            type:'GET',
+            dataType:'TEXT',
+            success:function(data){
+                if(data==='success'){
+                    requestXZqtsjDate();
+                    console.log("已确认其他事件记录...");
+                }
+            }
+        })
+    }
+    function zzqtsjok(obj){
+        $(obj).css('color','aqua');
+        var qrtime=$(obj).parent().parent().find('td:eq(1)').text();
+        $.ajax({
+            url:window.location.protocol+'//'+window.location.host+'/InspectionRecord-1.0/zz/updqtsj/'+qrtime,
+            type:'GET',
+            dataType:'TEXT',
+            success:function(data){
+                if(data==='success'){
+                    requestZZqtsjDate();
+                    console.log("已确认其他事件记录...");
+                }
+            }
+        })
+    }
+    // 确认
+
+
+    // 条件查询
+    function conditionalQuery(){
+        var banci=$('#banci').val();
+        var username=$('#username').val();
+        var starttime=$('#starttime').val();
+        var endtime=$('#endtime').val();
+        if(banci===''){
+            banci='null'
+        }
+        if(username===''){
+            username='null'
+        }
+        if(starttime===''){
+            starttime='1949-10-01'
+        }
+        if(endtime===''){
+            endtime='9999-12-31'
+        }
+        console.log(banci+'---'+username+'---'+starttime+'---'+endtime);
+        if (conditional===0) {
+            $.ajax({
+                url:window.location.protocol+'//'+window.location.host+'/InspectionRecord-1.0/xz/getxzxsjlbycond/'+banci+'/'+encodeURI(encodeURI(username))+'/'+starttime+'/'+endtime,
+                type:'get',
+                dataType:'text',
+                success:function(data){
+                    var newdata=JSON.parse(data);
+                    initXZxsjldata(newdata);
+                }
+            })
+            $.ajax({
+                url:window.location.protocol+'//'+window.location.host+'/InspectionRecord-1.0/xz/getxzsbjcbycond/'+banci+'/'+encodeURI(encodeURI(username))+'/'+starttime+'/'+endtime,
+                type:'get',
+                dataType:'text',
+                success:function(data){
+                    var newdata=JSON.parse(data);
+                    initXZsbjcdata(newdata);
+                }
+            })
+            $.ajax({
+                url:window.location.protocol+'//'+window.location.host+'/InspectionRecord-1.0/xz/getxzqtsjbycond/'+banci+'/'+encodeURI(encodeURI(username))+'/'+starttime+'/'+endtime,
+                type:'get',
+                dataType:'text',
+                success:function(data){
+                    var newdata=JSON.parse(data);
+                    initXZqtsjdata(newdata);
+                }
+            })
+        }else{
+            $.ajax({
+                url:window.location.protocol+'//'+window.location.host+'/InspectionRecord-1.0/zz/getzzxsjlbycond/'+banci+'/'+encodeURI(encodeURI(username))+'/'+starttime+'/'+endtime,
+                type:'get',
+                dataType:'text',
+                success:function(data){
+                    var newdata=JSON.parse(data);
+                    initZZxsjldata(newdata);
+                }
+            })
+            $.ajax({
+                url:window.location.protocol+'//'+window.location.host+'/InspectionRecord-1.0/zz/getzzqtsjbycond/'+banci+'/'+encodeURI(encodeURI(username))+'/'+starttime+'/'+endtime,
+                type:'get',
+                dataType:'text',
+                success:function(data){
+                    var newdata=JSON.parse(data);
+                    initZZqtsjdata(newdata);
+                }
+            })
+        }
+    }
+
+</script>
+</body>
+</html>
