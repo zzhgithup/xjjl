@@ -78,7 +78,7 @@ public class XZEquipInspectionController {
 
     @GetMapping("getxzsbjcbycond/{banci}/{username}/{starttime}/{endtime}")
     public String getxzsbjcbycond(@PathVariable("banci") String banci,@PathVariable("username") String username,@PathVariable("starttime") String starttime,@PathVariable("endtime") String endtime){
-        logger.info("根据条件查询行值设备检测记录...");
+        logger.info("根据条件查询行值设备检测记录");
         String name = null;
         try {
             name= URLDecoder.decode(username,"UTF-8");
@@ -86,7 +86,7 @@ public class XZEquipInspectionController {
             e.printStackTrace();
         }
         String result=xzEquipInspectionService.getxzsbjcbycond(banci,name,starttime,endtime);
-        logger.info("根据条件查询行值设备检测记录成功...");
+        logger.info("根据条件查询行值设备检测记录成功");
         return result;
     }
 }
