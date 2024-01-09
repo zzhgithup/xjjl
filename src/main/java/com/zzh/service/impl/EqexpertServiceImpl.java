@@ -20,14 +20,17 @@ public class EqexpertServiceImpl implements EqexpertService {
     EqexpertDao eqexpertDao;
 
     @Override
-    public ArrayList<Eqexpert> getAlmByTwo(String leve, String system) {
+    public ArrayList<Eqexpert> getAlmByTwo(String leve, String system, String line) {
         if(leve.equals("null")){
             leve="";
         }
         if(system.equals("null")){
             system="";
         }
-        ArrayList<Eqexpert> eqexperts=eqexpertDao.getAlmByTwo(leve,system);
+        if(line.equals("null")){
+            line="";
+        }
+        ArrayList<Eqexpert> eqexperts=eqexpertDao.getAlmByTwo(leve,system,line);
         return eqexperts;
     }
 }

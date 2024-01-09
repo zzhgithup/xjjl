@@ -14,6 +14,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class Eqexpert {
+    private String fd_line;
     private int fd_state;
     private String fd_time;
     private String fd_desc;
@@ -27,7 +28,8 @@ public class Eqexpert {
     @Override
     public String toString() {
         return "{" +
-                "\"fd_state\":" + fd_state +
+                "\"fd_line\":\"" + fd_line + '"' +
+                ",\"fd_state\":" + fd_state +
                 ",\"fd_time\":\"" + fd_time + '"' +
                 ",\"fd_desc\":\"" + fd_desc + '"' +
                 ",\"fd_leve\":" + fd_leve +

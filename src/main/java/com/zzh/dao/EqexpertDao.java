@@ -17,5 +17,5 @@ import java.util.ArrayList;
 @Mapper
 public interface EqexpertDao {
 
-    ArrayList<Eqexpert> getAlmByTwo(@Param("leve") String leve,@Param("system") String system);
+    ArrayList<Eqexpert> getAlmByTwo(@Param("leve") String leve,@Param("system") String system,@Param("line") String line);
 }

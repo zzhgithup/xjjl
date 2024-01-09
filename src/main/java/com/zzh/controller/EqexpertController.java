@@ -34,7 +34,7 @@ public class EqexpertController {
     public String contrast(@PathVariable("num") int num){
         if(num==0){
             logger.info("初始化页面数据");
-            getAlmByTwo("null","null");
+            getAlmByTwo("null","null","null");
             logger.info("初始化页面数据成功...");
             return results.toString();
         } else if(num==countNum){
@@ -46,11 +46,11 @@ public class EqexpertController {
     }
 
     @GetMapping("getinfos")
-    public void getAlmByTwo(@RequestParam("leve") String leve, @RequestParam("system") String system){
+    public void getAlmByTwo(@RequestParam("leve") String leve, @RequestParam("system") String system,@RequestParam("line") String line){
         countNum++;
         results.setCountNum(countNum);
         logger.info("设置统计数成功："+countNum);
-        ArrayList<Eqexpert> result=eqexpertService.getAlmByTwo(leve,system);
+        ArrayList<Eqexpert> result=eqexpertService.getAlmByTwo(leve,system,line);
         logger.info("获取信息成功："+result);
         results.setArr(result);
     }

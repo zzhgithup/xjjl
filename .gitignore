@@ -57,3 +57,4 @@ target/generated-test-sources/
 target/maven-archiver/
 target/maven-status/
 target/test-classes/
+/.idea/workspace.xml
