@@ -12,5 +12,5 @@ import java.util.ArrayList;
  * @Description TODO
  */
 public interface EqexpertService {
-    ArrayList<Eqexpert> getAlmByTwo(String leve, String system,String line);
+    ArrayList<Eqexpert> getAlmByTwo(String leve, String system);
 }

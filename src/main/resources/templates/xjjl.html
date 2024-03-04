@@ -58,6 +58,7 @@
             line-height: 30px;
             color: white;
             text-align: center;
+            overflow: auto;
         }
         th{
             background-image: url('static/img/tableHeader.png');
@@ -75,21 +76,21 @@
             cursor: pointer;
         }
         /* 滚动条样式 content_l 也可以不自定义*/
-        .tables::-webkit-scrollbar {
+        .tables::-webkit-scrollbar,td::-webkit-scrollbar {
             /*滚动条整体样式*/
             width: 2px;
             /*高宽分别对应横竖滚动条的尺寸*/
             height: 1px;
         }
 
-        .tables::-webkit-scrollbar-thumb {
+        .tables::-webkit-scrollbar-thumb,td::-webkit-scrollbar-thumb {
             /*滚动条里面小方块*/
             border-radius: 2px;
             -webkit-box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.2);
             background: #ffffff;
         }
 
-        .tables::-webkit-scrollbar-track {
+        .tables::-webkit-scrollbar-track,td::-webkit-scrollbar-track {
             /*滚动条里面轨道*/
             -webkit-box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.2);
             border-radius: 10px;
@@ -700,7 +701,7 @@
                     if(mark===1){
                         html += '<td style="flex: '+xzxsjlratio[sum]+'"><span style="pointer-events: none;">'+value+'</span></td>'
                     }else{
-                        html += '<td style="flex: '+xzxsjlratio[sum]+'"><span style="cursor: pointer;" onclick="xzxsjlbjshow(this)">点击编辑</span></td>'
+                        html += '<td style="flex: '+xzxsjlratio[sum]+'"><span style="cursor: pointer" onclick="xzxsjlbjshow(this)">点击编辑</span></td>'
                     }
 
                 }else{
@@ -751,7 +752,7 @@
                     if(mark===1){
                         html += '<td style="flex: '+xzsbjcratio[sum]+'"><span style="pointer-events: none;">'+value+'</span></td>'
                     }else{
-                        html += '<td style="flex: '+xzsbjcratio[sum]+'"><span style="cursor: pointer;" onclick="xzsbjcbjshow(this)">点击编辑</span></td>'
+                        html += '<td style="flex: '+xzsbjcratio[sum]+'"><span style="cursor: pointer" onclick="xzsbjcbjshow(this)">点击编辑</span></td>'
                     }
                 }else{
                     sum++;
@@ -791,7 +792,7 @@
                     if(mark===1){
                         html += '<td style="flex:'+xzqtsjratio[sum]+'"><span style="pointer-events: none;">'+value+'</span></td>'
                     }else{
-                        html += '<td style="flex: '+xzqtsjratio[sum]+'"><span style="cursor: pointer;" onclick="xzqtsjbjshow(this,'+key+')">点击编辑</span></td>'
+                        html += '<td style="flex: '+xzqtsjratio[sum]+'"><span style="cursor: pointer" onclick="xzqtsjbjshow(this,'+key+')">点击编辑</span></td>'
                         // html += '<td><span style="cursor: pointer;" onclick="xzsbjcbjshow(this)">点击编辑</span></td>'
                     }
                 }else{
@@ -833,7 +834,7 @@
                     if(mark===1){
                         html += '<td style="flex: '+zzqtsjratio[sum]+'"><span style="pointer-events: none;">'+value+'</span></td>'
                     }else{
-                        html += '<td style="flex: '+zzqtsjratio[sum]+'"><span style="cursor: pointer;" onclick="zzqtsjbjshow(this,'+key+')">点击编辑</span></td>'
+                        html += '<td style="flex: '+zzqtsjratio[sum]+'"><span style="cursor: pointer" onclick="zzqtsjbjshow(this,'+key+')">点击编辑</span></td>'
                         // html += '<td><span style="cursor: pointer;" onclick="xzsbjcbjshow(this)">点击编辑</span></td>'
                     }
 

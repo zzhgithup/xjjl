@@ -18,19 +18,16 @@ import java.util.ArrayList;
 public class EqexpertServiceImpl implements EqexpertService {
     @Autowired
     EqexpertDao eqexpertDao;
-
     @Override
-    public ArrayList<Eqexpert> getAlmByTwo(String leve, String system, String line) {
+    public ArrayList<Eqexpert> getAlmByTwo(String leve, String system) {
         if(leve.equals("null")){
             leve="";
         }
         if(system.equals("null")){
             system="";
         }
-        if(line.equals("null")){
-            line="";
-        }
-        ArrayList<Eqexpert> eqexperts=eqexpertDao.getAlmByTwo(leve,system,line);
+
+        ArrayList<Eqexpert> eqexperts=eqexpertDao.getAlmByTwo(leve,system);
         return eqexperts;
     }
 }

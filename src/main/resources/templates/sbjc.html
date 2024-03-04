@@ -88,7 +88,7 @@
         <table>
             <thead>
                 <tr>
-                    <th style="width: 100px;">线路名称</th>
+                    <!--<th style="width: 100px;">线路名称</th>-->
                     <th style="width: 150px;">产生时间</th>
                     <th style="width: 264px;">变量描述</th>
                     <th style="width: 100px;">子系统名</th>
@@ -131,11 +131,6 @@
         var html = '';
         for(var i=0;i<data.length;i++){
             html+='<tr>';
-            $.each(data[i],function(key,value){
-                if(key==='fd_line'){
-                    html+='<td style="width: 100px;">'+value+'</td>'
-                }
-            })
             $.each(data[i],function(key,value){
                 if(key==='fd_time'){
                     html+='<td style="width: 150px;">'+value+'</td>'

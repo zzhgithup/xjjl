@@ -5,6 +5,6 @@
 <!-- mapper:根标签，namespace：命名空间，一般保证命名空间唯一 -->
 <mapper namespace="com.zzh.dao.EqexpertDao">
     <select id="getAlmByTwo" resultType="com.zzh.pojo.Eqexpert">
-        select * from v_eqexpert_config where fd_state=1 and fd_leve like concat('%',#{leve},'%') and fd_system like concat('%',#{system},'%') and fd_line like concat('%',#{line},'%')
+        select * from v_eqexpert_config where fd_state=1 and fd_leve like concat('%',#{leve},'%') and fd_system like concat('%',#{system},'%')
     </select>
 </mapper>
